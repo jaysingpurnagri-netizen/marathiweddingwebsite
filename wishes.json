@@ -1,0 +1,26 @@
+[
+  {
+    "id": "wish_1",
+    "name": "सुरेश व वंदना भोरे (मामा-मामी)",
+    "relation": "वधूपक्ष",
+    "message": "साधना आणि आदित्य, तुमचे भावी वैवाहिक जीवन सुख, शांती, समाधान आणि प्रेमाने बहरून जावो हीच ईश्वरचरणी प्रार्थना!",
+    "likes": 12,
+    "createdAt": "2026-11-20T16:00:00.000Z"
+  },
+  {
+    "id": "wish_2",
+    "name": "रोहन व पूजा पाटील (मित्र परिवार)",
+    "relation": "वरपक्ष",
+    "message": "Heartiest congratulations Aditya & Sadhana! Wishing you a lifetime of joy, laughter, and endless romantic adventures!",
+    "likes": 8,
+    "createdAt": "2026-11-21T18:45:00.000Z"
+  },
+  {
+    "id": "wish_3",
+    "name": "आजी-आजोबांचे शुभाशीर्वाद",
+    "relation": "कुटुंब प्रमुख",
+    "message": "अखंड सौभाग्यवती भव! दोघांचा संसार दुधात साखर विरघळावी तसा गोड आणि एकरूप होवो. शंभर वर्षे सुखात नांदा!",
+    "likes": 25,
+    "createdAt": "2026-11-22T10:30:00.000Z"
+  }
+]

@@ -1,0 +1,74 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+# =============================================
+# REDIRECT RULES — ORDER MATTERS!
+# Netlify processes rules top-to-bottom, first match wins.
+# Specific rules MUST come before catch-all rules.
+# =============================================
+
+# --- Multi-Client Public Website Routing ---
+# /c/aaditi-rohan → serves index.html, script.js detects slug from path
+[[redirects]]
+  from = "/c/*"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/sites/*"
+  to = "/index.html"
+  status = 200
+
+# --- Admin Panel ---
+[[redirects]]
+  from = "/admin"
+  to = "/admin.html"
+  status = 200
+
+# --- Static File Downloads (specific, before /api/* catch-all) ---
+[[redirects]]
+  from = "/api/download-zip"
+  to = "/indian-culture-wedding-invitations.zip"
+  status = 302
+
+[[redirects]]
+  from = "/api/download-html"
+  to = "/wedding_invitation.html"
+  status = 302
+
+# --- Static JSON Fallbacks (specific, before /api/* catch-all) ---
+# These serve pre-built JSON files when Netlify Functions are unavailable
+[[redirects]]
+  from = "/api/websites"
+  to = "/websites/index.json"
+  status = 200
+
+[[redirects]]
+  from = "/api/settings"
+  to = "/websites/aaditi-rohan.json"
+  status = 200
+
+[[redirects]]
+  from = "/api/rsvp"
+  to = "/websites/rsvps_aaditi-rohan.json"
+  status = 200
+
+[[redirects]]
+  from = "/api/wishes"
+  to = "/websites/wishes_aaditi-rohan.json"
+  status = 200
+
+# --- Netlify Functions API (catch-all, LAST) ---
+# All other /api/* requests go to the serverless function
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+# --- SPA Fallback ---
+# Any unmatched route falls back to index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

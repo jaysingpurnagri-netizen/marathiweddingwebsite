@@ -1,0 +1,22 @@
+# Multi-client routing
+/c/*  /index.html  200
+/sites/*  /index.html  200
+
+# Admin
+/admin  /admin.html  200
+
+# Downloads (specific, before catch-all)
+/api/download-zip  /indian-culture-wedding-invitations.zip  302
+/api/download-html  /wedding_invitation.html  302
+
+# Static JSON fallbacks (specific, before catch-all)
+/api/websites  /websites/index.json  200
+/api/settings  /websites/aaditi-rohan.json  200
+/api/rsvp  /websites/rsvps_aaditi-rohan.json  200
+/api/wishes  /websites/wishes_aaditi-rohan.json  200
+
+# Netlify Functions API (catch-all, LAST)
+/api/*  /.netlify/functions/api/:splat  200
+
+# SPA fallback
+/*  /index.html  200

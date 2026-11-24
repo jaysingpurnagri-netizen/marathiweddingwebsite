@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 650 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="scrollGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF2A7" />
+      <stop offset="30%" stop-color="#E5C158" />
+      <stop offset="60%" stop-color="#C59B27" />
+      <stop offset="100%" stop-color="#7A5806" />
+    </linearGradient>
+    <linearGradient id="peshwaRed" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#B71C1C" />
+      <stop offset="100%" stop-color="#7F0000" />
+    </linearGradient>
+  </defs>
+
+  <!-- Farman / Scroll Seal Silhouette -->
+  <g transform="translate(325, 40) scale(0.6)">
+    <circle cx="0" cy="0" r="28" fill="url(#peshwaRed)" stroke="url(#scrollGold)" stroke-width="3"/>
+    <circle cx="0" cy="0" r="23" fill="none" stroke="url(#scrollGold)" stroke-width="1.5" stroke-dasharray="3,3"/>
+    <text x="0" y="8" font-family="'Rozha One', serif" font-size="22" font-weight="bold" fill="url(#scrollGold)" text-anchor="middle">श्री</text>
+  </g>
+
+  <!-- Top Decorative Lines -->
+  <path d="M 80,40 Q 220,15 285,40" fill="none" stroke="url(#scrollGold)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M 365,40 Q 430,15 570,40" fill="none" stroke="url(#scrollGold)" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- MAIN CALLIGRAPHY: लग्नपत्रिका -->
+  <text x="325" y="125" 
+        font-family="'Rozha One', 'Yatra One', 'Tiro Devanagari Marathi', serif" 
+        font-size="62" 
+        font-weight="900" 
+        text-anchor="middle" 
+        fill="url(#scrollGold)" 
+        stroke="url(#peshwaRed)" 
+        stroke-width="1.8"
+        letter-spacing="5">
+    ॥ लग्नपत्रिका ॥
+  </text>
+
+  <!-- Subtitle: पेशवेकालीन राजेशाही निमंत्रण -->
+  <text x="325" y="165" 
+        font-family="'Yatra One', cursive" 
+        font-size="19" 
+        font-weight="600" 
+        text-anchor="middle" 
+        fill="#800020" 
+        letter-spacing="4">
+    श्रीमंत पेशवेकालीन राजेशाही निमंत्रण पत्र
+  </text>
+
+  <!-- Bottom Arch Flourish -->
+  <path d="M 120,185 C 220,195 430,195 530,185" fill="none" stroke="url(#scrollGold)" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="325" cy="190" r="4" fill="url(#scrollGold)"/>
+</svg>

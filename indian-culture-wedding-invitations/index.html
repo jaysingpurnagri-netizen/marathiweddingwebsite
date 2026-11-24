@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>शुभ विवाह आमंत्रण | Royal Indian Wedding Celebration</title>
+    
+    <!-- Meta tags for social sharing -->
+    <meta name="description" content="॥ शुभ विवाह ॥ पावन विवाह सोहळ्याचे सस्नेह निमंत्रण.">
+    <meta property="og:title" content="शुभ विवाह आमंत्रण पत्रिका">
+    <meta property="og:description" content="॥ शुभ विवाह ॥ दोन जीवांचे मंगल मिलन!">
+    <meta property="og:image" content="assets/images/hero_couple.jpg">
+    
+    <!-- Google Fonts: Authentic Indian Typography & Classical Serif -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600;700&family=Rozha+One&family=Tiro+Devanagari+Marathi:ital@0;1&family=Yatra+One&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="themes_indian.css">
+    <link rel="stylesheet" href="invitation_open_styles.css">
+    <link rel="stylesheet" href="indian_culture_features.css">
+</head>
+<body data-theme="ghibli-fairytale">
+
+    <!-- Canvas for Floating Flowers & Akshata -->
+    <canvas id="petalsCanvas"></canvas>
+
+    <!-- Background Music Audio Element -->
+    <audio id="weddingAudio" loop preload="auto">
+        <source id="audioSource" src="assets/audio/marathi_wedding_shehnai.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- ==========================================================================
+         INTERACTIVE INVITATION ENTRANCE MODAL (Studio Ghibli x Indian Wedding)
+         ========================================================================== -->
+    <div id="invitationEntranceModal" class="invitation-gate-overlay">
+        <!-- Studio Ghibli Atmosphere Elements -->
+        <div class="ghibli-gate-decorations">
+            <div class="ghibli-gate-cloud cloud-top-left"></div>
+            <div class="ghibli-gate-cloud cloud-top-right"></div>
+            <div class="ghibli-gate-butterfly butterfly-1">🦋</div>
+            <div class="ghibli-gate-butterfly butterfly-2">🦋</div>
+            <div class="ghibli-gate-sparkle sparkle-1">✨</div>
+            <div class="ghibli-gate-sparkle sparkle-2">🌸</div>
+        </div>
+
+        <!-- Top Style Dock Selector (hidden by default for guests, visible in admin preview) -->
+        <div class="open-styles-dock">
+            <span class="dock-title"><i class="fa-solid fa-wand-magic-sparkles"></i> ओपनिंग स्टाईल:</span>
+            <button type="button" class="dock-btn active" data-style="envelope-wax"><i class="fa-solid fa-envelope"></i> १. मेणाची मुद्रा (Wax Seal)</button>
+            <button type="button" class="dock-btn" data-style="temple-doors"><i class="fa-solid fa-archway"></i> २. मंदिर महाद्वार (Doors)</button>
+            <button type="button" class="dock-btn" data-style="royal-scroll"><i class="fa-solid fa-scroll"></i> ३. शाही फर्मान (Scroll)</button>
+            <button type="button" class="dock-btn" data-style="silk-curtains"><i class="fa-solid fa-masks-theater"></i> ४. रेशमी पडदा (Curtains)</button>
+            <button type="button" class="dock-btn" data-style="book-flip"><i class="fa-solid fa-book-open"></i> ५. ३D पत्रिका (Book)</button>
+            <button type="button" class="dock-btn" data-style="shagun-box"><i class="fa-solid fa-gift"></i> ६. शगुन पेटी (Jewel Box)</button>
+        </div>
+
+        <!-- Clear Welcoming Instruction for Opening -->
+        <div class="opening-instruction-badge" id="gateInstructionBadge">
+            <span style="font-size:1.25rem;">✨</span>
+            <span id="gateInstructionText">लग्नपत्रिका उघडण्यासाठी खालील मेणाच्या मुद्रेवर (Seal) स्पर्श करा</span>
+            <span style="font-size:1.25rem;">✨</span>
+        </div>
+
+        <!-- Active Stage Container -->
+        <div class="opening-experience-stage">
+            <!-- STAGE 1: ROYAL SHAHI ENVELOPE (WAX SEAL) -->
+            <div id="stageEnvelope" class="envelope-stage" style="display: flex;">
+                <div class="envelope-wrapper">
+                    <div class="envelope-filigree-tl"></div>
+                    <div class="envelope-filigree-tr"></div>
+                    <div class="envelope-filigree-bl"></div>
+                    <div class="envelope-filigree-br"></div>
+                    <div class="envelope-flap-top"></div>
+                    <div class="envelope-pocket-front"></div>
+                    <div class="envelope-wax-seal" id="btnBreakWaxSeal" title="पत्रिका उघडण्यासाठी स्पर्श करा">
+                        <span class="seal-icon-om">ॐ</span>
+                        <span class="seal-text">उघडा</span>
+                        <span style="font-size:0.56rem; color:#FFE082; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">स्पर्श करा</span>
+                    </div>
+                    <div class="envelope-inner-card">
+                        <div class="card-ganesh"><i class="fa-solid fa-om"></i></div>
+                        <div class="card-shloka" id="gateCardShloka">॥ वक्रतुण्ड महाकाय सूर्यकोटि समप्रभ ॥</div>
+                        <div class="card-subtitle">॥ शुभ विवाह सस्नेह आमंत्रण ॥</div>
+                        <h2 class="card-couple" id="gateCardCouple">चि. सौ. कां. आदिती ❤️ चि. रोहन</h2>
+                        <div class="card-date" id="gateCardDate"><i class="fa-regular fa-calendar-check"></i> रविवार, १७ डिसेंबर २०२६ • दु. १२:३५ वा.</div>
+                        <button type="button" class="card-enter-btn" id="btnEnterCelebration1">
+                            ✨ लग्नपत्रिका उघडा व मंगल संगीत ऐका 🎵
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STAGE 2: SACRED TEMPLE DOUBLE DOORS -->
+            <div id="stageDoors" class="temple-doors-stage hidden" style="display: none;">
+                <div class="temple-arch-frame"></div>
+                <div class="temple-toran">
+                    <span>🍃</span><span>🌼</span><span>🥭</span><span>🌼</span><span>🍃</span>
+                </div>
+                <div class="temple-door door-left" id="templeDoorLeft">
+                    <div class="door-brass-studs">
+                        <div class="brass-stud"></div><div class="brass-stud"></div><div class="brass-stud"></div>
+                    </div>
+                    <div class="door-lion-knocker">🔔</div>
+                    <div style="color:#FFD700; font-size:0.8rem; font-weight:700;">स्पर्श करा</div>
+                </div>
+                <div class="temple-door door-right" id="templeDoorRight">
+                    <div class="door-brass-studs">
+                        <div class="brass-stud"></div><div class="brass-stud"></div><div class="brass-stud"></div>
+                    </div>
+                    <div class="door-lion-knocker">🔔</div>
+                    <div style="color:#FFD700; font-size:0.8rem; font-weight:700;">द्वार उघडा</div>
+                </div>
+                <div class="temple-inner-sanctum">
+                    <div class="card-ganesh" style="font-size:2.4rem;">🛕</div>
+                    <div class="card-shloka">॥ मंगलम भगवान विष्णुः मंगलम गरुडध्वजः ॥</div>
+                    <div class="card-subtitle">॥ पावन विवाह सोहळा ॥</div>
+                    <h2 class="card-couple" id="gateDoorsCouple">चि. सौ. कां. आदिती ❤️ चि. रोहन</h2>
+                    <div class="card-date" id="gateDoorsDate"><i class="fa-regular fa-calendar-check"></i> रविवार, १७ डिसेंबर २०२६ • गोरज मुहूर्त</div>
+                    <button type="button" class="card-enter-btn" id="btnEnterCelebration2">
+                        <i class="fa-solid fa-door-open"></i> मंदिरात प्रवेश करा
+                    </button>
+                </div>
+            </div>
+
+            <!-- STAGE 3: ROYAL FARMAN SCROLL -->
+            <div id="stageScroll" class="scroll-stage hidden" style="display: none;">
+                <div class="scroll-rod scroll-rod-top">
+                    <div class="scroll-finial"></div>
+                    <span style="color:#FFD700; font-size:0.75rem; letter-spacing:1px; font-weight:700;">॥ शाही फर्मान पत्र ॥</span>
+                    <div class="scroll-finial"></div>
+                </div>
+                <div class="scroll-parchment-body">
+                    <div class="scroll-ribbon-knot">
+                        <button type="button" class="ribbon-badge-btn" id="btnScrollRibbon">
+                            <i class="fa-solid fa-scroll"></i> रेशमी गाठ सोडा
+                        </button>
+                    </div>
+                    <div class="card-ganesh"><i class="fa-solid fa-crown"></i></div>
+                    <div class="card-shloka">॥ स्वस्ति श्री राज्याभिषेक शक ॥</div>
+                    <div class="card-subtitle">॥ राजेशाही विवाह निमंत्रण पत्र ॥</div>
+                    <h2 class="card-couple" id="gateScrollCouple">चि. सौ. कां. आदिती आणि चि. रोहन</h2>
+                    <div class="card-date" id="gateScrollDate"><i class="fa-regular fa-calendar-check"></i> रविवार, १७ डिसेंबर २०२६ • राजेशाही थाट</div>
+                    <button type="button" class="card-enter-btn" id="btnEnterCelebration3">
+                        <i class="fa-solid fa-scroll"></i> संपूर्ण पत्रिका पहा
+                    </button>
+                </div>
+                <div class="scroll-rod scroll-rod-bottom">
+                    <div class="scroll-finial"></div>
+                    <span style="color:#FFD700; font-size:0.75rem; letter-spacing:1px; font-weight:700;">॥ सस्नेह आमंत्रण ॥</span>
+                    <div class="scroll-finial"></div>
+                </div>
+            </div>
+
+            <!-- STAGE 4: RED SILK MANDAP CURTAINS -->
+            <div id="stageCurtains" class="silk-curtains-stage hidden" style="display: none;">
+                <div class="curtain-rod-bar"></div>
+                <div class="curtain-valance">
+                    <span class="valance-tassel">⚜️</span><span class="valance-tassel">⚜️</span><span class="valance-tassel">⚜️</span><span class="valance-tassel">⚜️</span>
+                </div>
+                <div class="curtain-panel curtain-left"></div>
+                <div class="curtain-panel curtain-right"></div>
+                <div class="curtain-center-clasp" id="btnOpenCurtains">
+                    <span style="font-size:1.4rem;">🎭</span>
+                    <span style="font-size:0.65rem; color:#FFF; text-transform:uppercase;">पडदा उघडा</span>
+                </div>
+                <div class="curtain-revealed-stage">
+                    <div class="card-ganesh" style="font-size:2.2rem; color:#800020;">🌺</div>
+                    <div class="card-shloka">॥ दोन जीवांचे रेशमी बंध ॥</div>
+                    <div class="card-subtitle">॥ विवाह मंडपात आपले सहर्ष स्वागत ॥</div>
+                    <h2 class="card-couple" id="gateCurtainsCouple">चि. सौ. कां. आदिती ❤️ चि. रोहन</h2>
+                    <div class="card-date" id="gateCurtainsDate"><i class="fa-regular fa-calendar-check"></i> रविवार, १७ डिसेंबर २०२६ • मंगल क्षण</div>
+                    <button type="button" class="card-enter-btn" id="btnEnterCelebration4">
+                        <i class="fa-solid fa-masks-theater"></i> मंडपात प्रवेश करा
+                    </button>
+                </div>
+            </div>
+
+            <!-- STAGE 5: 3D HARDBOUND WEDDING PATRIKA BOOK -->
+            <div id="stageBook" class="book-stage hidden" style="display: none;">
+                <div class="book-body">
+                    <div class="book-spine"></div>
+                    <div class="book-cover" id="btnOpenBookCover">
+                        <div class="book-gold-mandala">☸️</div>
+                        <div style="color:#FFD700; font-family:'Rozha One',serif; font-size:1.6rem; margin-bottom:8px;">॥ शुभ लग्नपत्रिका ॥</div>
+                        <div style="color:#FFF8E7; font-size:0.95rem; margin-bottom:15px;" id="gateBookCoverCouple">आदिती संग रोहन</div>
+                        <div style="background:rgba(212,175,55,0.25); border:1px solid #FFD700; color:#FFD700; padding:6px 16px; border-radius:20px; font-size:0.8rem; font-weight:700;">
+                            📖 पान उलटा (Click to Open)
+                        </div>
+                    </div>
+                    <div class="book-inner-page">
+                        <div class="card-ganesh"><i class="fa-solid fa-feather-pointed"></i></div>
+                        <div class="card-shloka">॥ श्री गणेशाय नमः ॥</div>
+                        <div class="card-subtitle">॥ विवाह आमंत्रण पत्रिका ॥</div>
+                        <h2 class="card-couple" id="gateBookCouple">चि. सौ. कां. आदिती ❤️ चि. रोहन</h2>
+                        <div class="card-date" id="gateBookDate"><i class="fa-regular fa-calendar-check"></i> रविवार, १७ डिसेंबर २०२६ • दु. १२:३५ वा.</div>
+                        <button type="button" class="card-enter-btn" id="btnEnterCelebration5">
+                            <i class="fa-solid fa-book-open"></i> शुभ सोहळा एक्सप्लोर करा
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STAGE 6: IMPERIAL SHAGUN JEWEL BOX -->
+            <div id="stageBox" class="shagun-box-stage hidden" style="display: none;">
+                <div class="shagun-box-casing">
+                    <div class="shagun-box-lid" id="btnOpenBoxLid">
+                        <div style="color:#FFD700; font-family:'Rozha One',serif; font-size:1.4rem; text-shadow:0 2px 8px rgba(0,0,0,0.8);">
+                            🎁 शाही शगुन पेटी
+                        </div>
+                        <div class="shagun-box-clasp" id="boxClasp">
+                            <span>🔒</span>
+                        </div>
+                    </div>
+                    <div class="shagun-box-card">
+                        <div class="card-ganesh"><i class="fa-solid fa-gem"></i></div>
+                        <div class="card-shloka">॥ अनमोल प्रेम, मंगल आशीर्वाद ॥</div>
+                        <div class="card-subtitle">॥ शुभविवाह विशेष आमंत्रण ॥</div>
+                        <h2 class="card-couple" id="gateBoxCouple">चि. सौ. कां. आदिती ❤️ चि. रोहन</h2>
+                        <div class="card-date" id="gateBoxDate"><i class="fa-regular fa-calendar-check"></i> रविवार, १७ डिसेंबर २०२६ • शुभ मुहूर्त</div>
+                        <button type="button" class="card-enter-btn" id="btnEnterCelebration6">
+                            <i class="fa-solid fa-gift"></i> शुभ सोहळ्यात सामील व्हा
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skip and Hint Controls -->
+        <div style="margin-top:20px; display:flex; gap:16px; align-items:center;">
+            <button type="button" class="btn-gate-skip" id="btnSkipEntrance">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i> थेट संपूर्ण पत्रिका पहा (Skip Directly)
+            </button>
+        </div>
+        <div class="gate-footer-hint">
+            <i class="fa-solid fa-music"></i> पत्रिका उघडल्यावर मंगल सनई-संगीत आपोआप सुरू होईल 🎶
+        </div>
+    </div>
+
+    <!-- Top Auspicious Shloka Announcement -->
+    <div class="top-announcement">
+        <span class="marquee-text" id="topAnnouncementText">
+            ॥ वक्रतुण्ड महाकाय सूर्यकोटि समप्रभ । निर्विघ्नं कुरु मे देव सर्वकार्येषु सर्वदा ॥
+        </span>
+    </div>
+
+    <!-- Main Navigation Header -->
+    <header class="site-header" id="header">
+        <div class="header-container">
+            <a href="#hero" class="logo-link">
+                <div class="logo-symbol">🚩</div>
+                <div class="logo-text-group">
+                    <span class="logo-title" id="headerLogoText">चि. रोहन & चि. सौ. कां. आदिती</span>
+                    <span class="logo-sub">॥ शुभ विवाह ॥</span>
+                </div>
+            </a>
+
+            <nav class="main-nav" id="mainNav">
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#hero" class="nav-link active">होम</a></li>
+                    <li><a href="#story" class="nav-link">प्रेमकथा</a></li>
+                    <li><a href="#ceremonies" class="nav-link">सोहळा व मुहूर्त</a></li>
+                    <li><a href="#video" class="nav-link">चलचित्र</a></li>
+                    <li><a href="#saptapadi" class="nav-link">सप्तपदी</a></li>
+                    <li><a href="#gallery" class="nav-link">फोटो गॅलरी</a></li>
+                    <li><a href="#dresscode" class="nav-link">पोशाख</a></li>
+                    <li><a href="#aarti" class="nav-link">आरती</a></li>
+                    <li><a href="#shagun" class="nav-link">शगुन UPI</a></li>
+                    <li><a href="#rsvp" class="nav-link">RSVP</a></li>
+                    <li><a href="#venue" class="nav-link">स्थळ व मार्ग</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <!-- Language Switcher Pill injected/handled by language_engine.js -->
+                <div class="lang-selector-pill" id="headerLangPill">
+                    <button type="button" class="lang-btn active" data-lang="mr">मराठी</button>
+                    <button type="button" class="lang-btn" data-lang="hi">हिंदी</button>
+                    <button type="button" class="lang-btn" data-lang="en">English</button>
+                </div>
+
+                <button class="action-btn music-btn" id="toggleMusicBtn" title="सनई संगीत चालू/बंद करा">
+                    <i class="fa-solid fa-music"></i>
+                    <span class="btn-text" id="headerMusicText">सनई संगीत</span>
+                </button>
+                
+                <button class="action-btn style-btn" id="reopenGateBtn" title="पत्रिका पुन्हा उघडा">
+                    <i class="fa-solid fa-envelope-open-text"></i>
+                    <span class="btn-text">पत्रिका उघडा</span>
+                </button>
+
+                <button class="action-btn theme-quick-btn" id="quickThemesBtn" title="थीम बदला">
+                    <i class="fa-solid fa-palette"></i>
+                    <span class="btn-text">थीम बदला</span>
+                </button>
+
+                <button class="mobile-toggle-btn" id="mobileMenuBtn" aria-label="मेनू उघडा">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section" id="hero">
+        <div class="hero-bg-overlay"></div>
+        <div class="container hero-container">
+            <div class="ganesh-invocation">
+                <div class="ganesh-icon-wrap">
+                    <i class="fa-solid fa-om ganesh-icon"></i>
+                </div>
+                <p class="shloka-text" id="dynWeddingShloka">वक्रतुण्ड महाकाय सूर्यकोटि समप्रभ । निर्विघ्नं कुरु मे देव सर्वकार्येषु सर्वदा ॥</p>
+                <div class="kuldaivat-badge" id="dynKuldaivat">॥ शिवलक्ष्मी प्रसन्न ॥</div>
+            </div>
+
+            <div class="hero-couple-showcase">
+                <div class="couple-card groom-card">
+                    <div class="couple-salut" id="dynGroomSalut">चिरंजीव</div>
+                    <h2 class="couple-name" id="dynGroomName">रोहन</h2>
+                    <div class="couple-lineage">
+                        <p class="parents-line" id="dynGroomParents">श्री. दत्तात्रय नागोजी वाकोडे यांचा कनिष्ठ चिरंजीव</p>
+                        <p class="grandparents-line" id="dynGroomGrandparents">स्व. श्री. नागोजी सायबण्णा वाकोडे यांचा नातू</p>
+                        <p class="native-place" id="dynGroomNative"><i class="fa-solid fa-location-dot"></i> गा. सरडगी, रा. अंबरनाथ</p>
+                    </div>
+                </div>
+
+                <div class="wedding-knot-badge">
+                    <div class="knot-circle">
+                        <span class="knot-symbol">💍</span>
+                        <span class="knot-sub" id="dynWeddingTitle">शुभ विवाह</span>
+                    </div>
+                </div>
+
+                <div class="couple-card bride-card">
+                    <div class="couple-salut" id="dynBrideSalut">चि. सौ. कां.</div>
+                    <h2 class="couple-name" id="dynBrideName">आदिती</h2>
+                    <div class="couple-lineage">
+                        <p class="parents-line" id="dynBrideParents">श्री. नागराज बाबुराव भोरे यांची द्वितीय कन्या</p>
+                        <p class="grandparents-line" id="dynBrideGrandparents">स्व. श्री. बाबुराव शिवराम भोरे यांची नात</p>
+                        <p class="native-place" id="dynBrideNative"><i class="fa-solid fa-location-dot"></i> गा. डारसुर, रा. पुणे</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date & Muhurt Banner -->
+            <div class="muhurt-highlight-card">
+                <div class="muhurt-item">
+                    <i class="fa-solid fa-calendar-day icon-gold"></i>
+                    <div class="muhurt-info">
+                        <span class="label">विवाह दिनांक</span>
+                        <strong class="value" id="dynWeddingDateText">रविवार, १७ डिसेंबर २०२६</strong>
+                    </div>
+                </div>
+                <div class="muhurt-divider"></div>
+                <div class="muhurt-item">
+                    <i class="fa-solid fa-clock icon-gold"></i>
+                    <div class="muhurt-info">
+                        <span class="label">शुभ गोरज मुहूर्त</span>
+                        <strong class="value" id="dynWeddingMuhurt">दुपारी १२ वा. ३५ मि. (गोरज मुहूर्त)</strong>
+                    </div>
+                </div>
+                <div class="muhurt-divider"></div>
+                <div class="muhurt-item">
+                    <i class="fa-solid fa-location-dot icon-gold"></i>
+                    <div class="muhurt-info">
+                        <span class="label">विवाह स्थळ</span>
+                        <strong class="value" id="dynVenueName">माउली गार्डन, बाणेर रोड, पुणे</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Countdown Timer -->
+            <div class="countdown-wrapper">
+                <h3 class="countdown-title"><i class="fa-regular fa-bell"></i> सोहळ्यासाठी शिल्लक वेळ</h3>
+                <div class="countdown-timer" id="countdownTimer">
+                    <div class="time-box">
+                        <span class="num" id="days">00</span>
+                        <span class="lbl" id="lblDays">दिवस</span>
+                    </div>
+                    <div class="time-sep">:</div>
+                    <div class="time-box">
+                        <span class="num" id="hours">00</span>
+                        <span class="lbl" id="lblHours">तास</span>
+                    </div>
+                    <div class="time-sep">:</div>
+                    <div class="time-box">
+                        <span class="num" id="minutes">00</span>
+                        <span class="lbl" id="lblMinutes">मिनिटे</span>
+                    </div>
+                    <div class="time-sep">:</div>
+                    <div class="time-box">
+                        <span class="num" id="seconds">00</span>
+                        <span class="lbl" id="lblSeconds">सेकंद</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action CTA Buttons -->
+            <div class="hero-buttons">
+                <button id="heroOpenScrollBtn" class="btn btn-primary">
+                    <i class="fa-solid fa-scroll"></i> शाही पत्रिका उघडा
+                </button>
+                <a href="#video" class="btn btn-accent" id="heroWatchVideoBtn">
+                    <i class="fa-solid fa-circle-play"></i> विवाह व्हिडिओ पहा
+                </a>
+                <button id="btnAddToCalendar" class="btn btn-secondary">
+                    <i class="fa-regular fa-calendar-plus"></i> कॅलेंडरमध्ये जोडा
+                </button>
+                <button id="addToCalendarBtn" style="display:none;"></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Love Story Section -->
+    <section class="story-section section-padding" id="story">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" id="dynStoryTag">दोन मनांचे मीलन</span>
+                <h2 class="section-title" id="dynStoryTitle">आमची रेशीमगाठ</h2>
+                <div class="marigold-divider"></div>
+            </div>
+
+            <div class="story-grid">
+                <div class="story-image-col">
+                    <div class="story-img-card">
+                        <img id="dynStoryImg" src="assets/images/sahyadri_romance.jpg" alt="नवदांपत्य" class="story-img">
+                        <div class="caption-overlay">
+                            <span>दोन जीवांचे पवित्र मिलन व जीवनप्रवास...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="story-text-col">
+                    <div class="quote-card">
+                        <i class="fa-solid fa-quote-left quote-icon"></i>
+                        <p class="quote-marathi" id="dynStoryQuote">
+                            "निसर्गाच्या साक्षीने, दोन हृदयांची तार जुळली आणि मैत्रीचे रूपांतर एका सुंदर, पवित्र जीवन प्रवासात झाले!"
+                        </p>
+                    </div>
+
+                    <div class="story-timeline" id="dynStoryTimeline">
+                        <div class="timeline-step">
+                            <div class="step-num">१</div>
+                            <div class="step-content">
+                                <h4>पहिली भेट व ओळख</h4>
+                                <p>कॉलेजच्या दिवसांत निसर्गरम्य वातावरणात झालेली पहिली भेट आणि हळुवार सुरू झालेली सुंदर मैत्री.</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-step">
+                            <div class="step-num">२</div>
+                            <div class="step-content">
+                                <h4>मैत्रीचे रूपांतर प्रेमात</h4>
+                                <p>एकमेकांचे विचार, स्वप्ने आणि सुख-दुःखात सोबत लाभली आणि मैत्री प्रेमाच्या पवित्र बंधनात गुंफली गेली.</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-step">
+                            <div class="step-num">३</div>
+                            <div class="step-content">
+                                <h4>कुटुंबाची संमती व साखरपुडा</h4>
+                                <p>दोन्ही परिवारांच्या शुभाशीर्वादाने आणि आप्तेष्टांच्या उपस्थितीत संपन्न झालेला मंगल साखरपुडा सोहळा.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Video Showcase Section -->
+    <section class="video-section section-padding" id="video">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">चलचित्र व पूर्वझलक</span>
+                <h2 class="section-title" id="dynVideoTitle">आमचा विवाह प्रवास (Cinema Trailer)</h2>
+                <p class="section-desc">आमच्या प्रेमप्रवासाचे सुंदर व संस्मरणीय क्षण या व्हिडिओमध्ये पाहा</p>
+                <div class="marigold-divider"></div>
+            </div>
+
+            <div class="video-card-container">
+                <div class="video-player-box">
+                    <video id="weddingVideo" controls poster="assets/images/hero_couple.jpg" preload="metadata">
+                        <source src="assets/video/ghibli_wedding_journey.mp4" type="video/mp4">
+                        आपला ब्राउझर हा व्हिडिओ सपोर्ट करत नाही.
+                    </video>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ceremonies & Itinerary Section -->
+    <section class="ceremonies-section section-padding" id="ceremonies">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">सनई चौघडे व कार्यक्रम</span>
+                <h2 class="section-title">सोहळा व विधी पत्रिका</h2>
+                <p class="section-desc">आपल्या उपस्थितीने प्रत्येक विधीला मंगलमय रूप प्राप्त होईल</p>
+                <div class="marigold-divider"></div>
+            </div>
+
+            <div class="ceremonies-grid" id="dynCeremoniesGrid">
+                <!-- Dynamically populated from settings.json / Admin -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Saptapadi (7 Sacred Vows) Section -->
+    <section class="saptapadi-section section-padding" id="saptapadi">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">अग्नी साक्षीने सात फेरे</span>
+                <h2 class="section-title">पवित्र सप्तपदी व वचने</h2>
+                <p class="section-desc">अग्नीभोवती सात फेरे आणि आयुष्यभराच्या एकनिष्ठतेची सात पवित्र वचने</p>
+                <div class="marigold-divider"></div>
+            </div>
+
+            <div class="saptapadi-grid" id="saptapadiGrid">
+                <!-- 7 Vows Cards rendered via JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Photo Gallery Section -->
+    <section class="gallery-section section-padding" id="gallery">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">सुंदर क्षणांची साक्ष</span>
+                <h2 class="section-title">छायाचित्र दालन (Photo Gallery)</h2>
+                <p class="section-desc">हळद, संगीत, साखरपुडा व विवाह सोहळ्यातील आनंददायी क्षण</p>
+                <div class="marigold-divider"></div>
+            </div>
+
+            <div class="gallery-filter-bar">
+                <button class="gallery-filter-btn active" data-filter="all">सर्व फोटो</button>
+                <button class="gallery-filter-btn" data-filter="couple">जोडी</button>
+                <button class="gallery-filter-btn" data-filter="engagement">साखरपुडा</button>
+                <button class="gallery-filter-btn" data-filter="haldi">हळद</button>
+                <button class="gallery-filter-btn" data-filter="wedding">विवाह</button>
+            </div>
+
+            <div class="gallery-grid" id="dynGalleryGrid">
+                <!-- Populated via JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Wardrobe & Dress Code Palette -->
+    <section class="dresscode-section section-padding" id="dresscode">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">रंगसंगती व शैली</span>
+                <h2 class="section-title">पोशाख व रंगसंगती मार्गदर्शक</h2>
+                <p class="section-desc">सोहळ्यातील प्रत्येक कार्यक्रमाला अधिक देखणे बनवण्यासाठी सुचवलेली रंगसंगती</p>
+                <div class="marigold-divider"></div>
+            </div>
+
+            <div class="dresscode-grid" id="dresscodeGrid">
+                <!-- Rendered dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Virtual Aarti & Sacred Diya Lighting -->
+    <section class="aarti-section section-padding" id="aarti">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">मंगल दीप प्रज्वलन</span>
+                <h2 class="section-title">व्हर्च्युअल आरती व शुभाशीर्वाद</h2>
+                <p class="section-desc">आपल्या हाताने पवित्र दिवा प्रज्वलित करून नवदांपत्यास ईश्वरीय शुभाशीर्वाद द्या</p>
+                <div class="marigold-divider"></div>
+            </div>
+
+            <div class="aarti-card">
+                <div class="diya-display-box" id="diyaContainer" style="cursor:pointer;">
+                    <div class="sacred-diya" id="virtualDiya">
+                        <div class="diya-flame" id="diyaFlame"></div>
+                        <div class="diya-base">🪔</div>
+                    </div>
+                </div>
+                <div class="aarti-actions">
+                    <button type="button" class="btn btn-primary" id="btnLightDiya">
+                        <i class="fa-solid fa-fire-flame-curved"></i> मंगल दिवा प्रज्वलित करा
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="btnShowerFlowers">
+                        <i class="fa-solid fa-spa"></i> पुष्पवृष्टी करा (Flower Shower)
+                    </button>
+                </div>
+                <div class="aarti-counter">
+                    <i class="fa-solid fa-heart" style="color:#E63946;"></i> आतापर्यंत <strong id="diyaCounterText">४६२</strong> पाहुण्यांनी मंगल दीप प्रज्वलित केला आहे!
+                </div>
+            </div>
+
+            <!-- Baraat Battle (Team Groom vs Team Bride) -->
+            <div class="baraat-battle-box" id="baraat-battle">
+                <h3 class="battle-title"><i class="fa-solid fa-drum"></i> <span id="dynBaraatTitle">वरात महायुद्ध (Baraat Battle)</span></h3>
+                <p class="battle-sub">तुम्ही कोणाच्या बाजूने आहात? वधू पक्ष की वर पक्ष?</p>
+                <div class="battle-buttons">
+                    <button type="button" class="team-btn groom-team" id="btnVoteGroom">
+                        🕺 <span id="dynGroomTeamName">वर पक्ष (Team Groom)</span> <strong id="countGroomVotes">१६४ मते</strong>
+                    </button>
+                    <button type="button" class="team-btn bride-team" id="btnVoteBride">
+                        💃 <span id="dynBrideTeamName">वधू पक्ष (Team Bride)</span> <strong id="countBrideVotes">१७८ मते</strong>
+                    </button>
+                </div>
+                <div class="battle-bar-track">
+                    <div class="battle-bar-fill" id="meterGroom" style="width: 48%;"></div>
+                    <div class="battle-bar-fill" id="meterBride" style="width: 52%; background:#E91E63; display:none;"></div>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:0.85rem; font-weight:700;">
+                    <span id="pctGroom" style="color:#2E7D32;">४८% वरपक्ष</span>
+                    <span id="pctBride" style="color:#C2185B;">५२% वधूपक्ष</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Digital Shagun & UPI QR Generator -->
+    <section class="shagun-section section-padding" id="shagun">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">सस्नेह भेट</span>
+                <h2 class="section-title">डिजिटल आहेर व शगुन (UPI)</h2>
+                <p class="section-desc" id="dynShagunNote">आपले शुभाशीर्वाद हीच सर्वात मोठी भेट आहे! तथापि डिजिटल शगुन पाठवू इच्छिणाऱ्यांसाठी सोयीस्कर UPI व्यवस्था:</p>
+                <div class="marigold-divider"></div>
+            </div>
+
+            <div class="shagun-container">
+                <div class="shagun-envelope-card">
+                    <div class="shagun-card-header">
+                        <span class="shagun-symbol">🕉️</span>
+                        <h3>मंगल शगुन पाकीट</h3>
+                        <p class="shagun-payee">खातेदार: <strong id="dynPayeeName">Aditya & Sadhana Vivah</strong></p>
+                        <p class="shagun-upi-id">UPI ID: <code id="dynUpiId">aditya.sadhana@okaxis</code></p>
+                    </div>
+
+                    <!-- Preset Amount Chips -->
+                    <div class="amount-chips-wrapper" id="shagunAmountChips">
+                        <!-- Chips inserted dynamically: ₹501, ₹1101, ₹2101, ₹5101 -->
+                    </div>
+
+                    <!-- Live QR Code -->
+                    <div class="qr-code-box">
+                        <img id="shagunQrImg" src="" alt="UPI Shagun QR Code" class="qr-image">
+                    </div>
+
+                    <div class="shagun-actions">
+                        <a href="#" id="btnOpenUpiApp" class="btn btn-primary">
+                            <i class="fa-solid fa-mobile-screen"></i> UPI ॲपद्वारे पैसे पाठवा (GPay/PhonePe/Paytm)
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RSVP Section -->
+    <section class="rsvp-section section-padding" id="rsvp">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">उपस्थिती नोंदवा</span>
+                <h2 class="section-title">निमंत्रण स्वीकृती (RSVP)</h2>
+                <p class="section-desc">आपल्या उपस्थितीची नोंद केल्यास आम्हास उत्तम नियोजन करता येईल</p>
+                <div class="marigold-divider"></div>
+            </div>
+
+            <div class="rsvp-card-wrap">
+                <form id="rsvpForm" class="rsvp-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="rsvpName"><i class="fa-solid fa-user"></i> आपले पूर्ण नाव *</label>
+                            <input type="text" id="rsvpName" name="name" required placeholder="उदा. श्री. राहुल पाटील">
+                            <input type="hidden" id="guestName" name="guestName">
+                        </div>
+                        <div class="form-group">
+                            <label for="rsvpPhone"><i class="fa-solid fa-phone"></i> व्हॉट्सॲप / मोबाईल नंबर *</label>
+                            <input type="tel" id="rsvpPhone" name="phone" required placeholder="उदा. ९८२२० १२३४५">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="rsvpGuests"><i class="fa-solid fa-users"></i> एकूण उपस्थित सदस्यांची संख्या *</label>
+                            <select id="rsvpGuests" name="guests">
+                                <option value="1">१ व्यक्ती</option>
+                                <option value="2" selected>२ व्यक्ती</option>
+                                <option value="3">३ व्यक्ती</option>
+                                <option value="4">४ व्यक्ती</option>
+                                <option value="5+">५ किंवा अधिक व्यक्ती (सपरिवार)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="rsvpAttendance"><i class="fa-solid fa-calendar-check"></i> उपस्थिती स्थिती *</label>
+                            <select id="rsvpAttendance" name="attending">
+                                <option value="yes" selected>होय, आम्ही नक्की उपस्थित राहू!</option>
+                                <option value="maybe">कदाचित उपस्थित राहू शकू</option>
+                                <option value="no">क्षमस्व, काही कारणास्तव उपस्थित राहता येणार नाही</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-champagne-glasses"></i> कोणत्या कार्यक्रमांना उपस्थित राहणार आहात?</label>
+                        <div class="checkbox-pill-group">
+                            <label class="pill-check"><input type="checkbox" name="events" value="haldi" checked> हळद</label>
+                            <label class="pill-check"><input type="checkbox" name="events" value="mehendi" checked> मेहंदी व संगीत</label>
+                            <label class="pill-check"><input type="checkbox" name="events" value="wedding" checked> शुभविवाह सोहळा</label>
+                            <label class="pill-check"><input type="checkbox" name="events" value="reception" checked> स्वागत समारंभ व भोजन</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rsvpWishes"><i class="fa-solid fa-heart"></i> नवदांपत्यास मंगल संदेश व शुभाशीर्वाद</label>
+                        <textarea id="rsvpWishes" name="wishes" rows="3" placeholder="आपल्या मनःपूर्वक शुभेच्छा येथे लिहा..."></textarea>
+                        <input type="hidden" id="guestBlessing" name="guestBlessing">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-large" id="btnSubmitRsvp">
+                            <i class="fa-solid fa-paper-plane"></i> उपस्थिती नोंदवा (Submit RSVP)
+                        </button>
+                    </div>
+
+                    <div id="rsvpStatusAlert" class="status-alert hidden"></div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Venue & Google Maps Section -->
+    <section class="venue-section section-padding" id="venue">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">स्थळ व नकाशा</span>
+                <h2 class="section-title">विवाह स्थळ व मार्ग</h2>
+                <div class="marigold-divider"></div>
+            </div>
+
+            <div class="venue-grid">
+                <div class="venue-details-card">
+                    <div class="venue-icon-circle">
+                        <i class="fa-solid fa-map-location-dot"></i>
+                    </div>
+                    <h3 class="venue-name-large" id="dynVenueCardName">माउली रॉयल पॅलेस</h3>
+                    <p class="venue-address-full" id="dynVenueAddress">
+                        बाणेर-बालेवाडी लिंक रोड, पुणे, महाराष्ट्र - ४११०४५
+                    </p>
+                    <div class="venue-contacts">
+                        <p><i class="fa-solid fa-phone"></i> संपर्क: <strong id="dynVenuePhone">+९१ ९८२२० १२३४५</strong></p>
+                        <p><i class="fa-solid fa-utensils"></i> प्रीतीभोजन: <strong id="dynBhojanTime">दुपारी १२:४५ ते ०३:३० वा.</strong></p>
+                    </div>
+                    <div class="venue-actions">
+                        <a href="https://maps.google.com/?q=Mauli+Palace+Baner+Road+Pune" target="_blank" rel="noopener" class="btn btn-primary" id="dynGoogleMapsBtn">
+                            <i class="fa-solid fa-location-arrow"></i> गुगल मॅप्सवर दिशा दाखवा (Navigate)
+                        </a>
+                    </div>
+                </div>
+
+                <div class="venue-map-card">
+                    <iframe id="dynGoogleMapsIframe" 
+                            src="https://maps.google.com/maps?q=Mauli+Garden+Baner+Road+Pune&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                            width="100%" height="340" style="border:0; border-radius:12px;" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Royal Parchment Scroll Modal -->
+    <div id="scrollSection" class="royal-scroll-modal hidden">
+        <div class="scroll-backdrop" id="scrollBackdrop"></div>
+        <div class="scroll-wrapper">
+            <button class="scroll-close-btn" id="btnCloseScroll" title="बंद करा">&times;</button>
+            <div class="parchment-container">
+                <div class="royal-roller royal-roller-top">
+                    <div class="roller-finial left"></div>
+                    <div class="roller-cylinder"></div>
+                    <div class="roller-finial right"></div>
+                </div>
+
+                <div class="scroll-parchment-sheet">
+                    <div class="parchment-inner">
+                        <div class="scroll-heading">
+                            <div class="scroll-ganesh-icon"><i class="fa-solid fa-om"></i></div>
+                            <h3 class="scroll-title">॥ शुभ विवाह सस्नेह आमंत्रण पत्रिका ॥</h3>
+                            <p class="scroll-shloka" id="dynScrollShloka">वक्रतुण्ड महाकाय सूर्यकोटि समप्रभ । निर्विघ्नं कुरु मे देव सर्वकार्येषु सर्वदा ॥</p>
+                            <div class="scroll-kuldaivat" id="dynScrollKuldaivat">॥ श्री गणेशाय नमः ॥ श्री कुलदेवता प्रसन्न ॥</div>
+                        </div>
+
+                        <div class="scroll-couple-block">
+                            <div class="scroll-side">
+                                <span class="side-salut" id="dynScrollBrideSalut">चि. सौ. कां.</span>
+                                <h4 class="side-name" id="dynScrollBrideName">आदिती</h4>
+                                <p id="dynScrollBrideParents">श्री. नागराज बाबुराव भोरे यांची द्वितीय कन्या</p>
+                            </div>
+                            <div class="scroll-knot">संग</div>
+                            <div class="scroll-side">
+                                <span class="side-salut" id="dynScrollGroomSalut">चिरंजीव</span>
+                                <h4 class="side-name" id="dynScrollGroomName">रोहन</h4>
+                                <p id="dynScrollGroomParents">श्री. दत्तात्रय नागोजी वाकोडे यांचा कनिष्ठ चिरंजीव</p>
+                            </div>
+                        </div>
+
+                        <div class="scroll-details">
+                            <p><strong>शुभविवाह दिनांक:</strong> <span id="dynScrollDate">रविवार, १७ डिसेंबर २०२६</span></p>
+                            <p><strong>शुभ गोरज मुहूर्त:</strong> <span id="dynScrollMuhurt">दुपारी १२:३५ वा. (गोरज मुहूर्त)</span></p>
+                            <p><strong>विवाह स्थळ:</strong> <span id="dynScrollVenue">माउली गार्डन, बाणेर रोड, पुणे</span></p>
+                            <p id="dynScrollAherNote">कृपया आहेर अथवा भेटवस्तू न आणता केवळ आपली मंगल उपस्थिती हीच बहुमोल भेट!</p>
+                        </div>
+
+                        <div class="scroll-footer-actions">
+                            <button class="btn btn-primary" id="btnEnterWebsite">
+                                <i class="fa-solid fa-heart"></i> संपूर्ण संकेतस्थळ एक्सप्लोर करा
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="royal-roller royal-roller-bottom">
+                    <div class="roller-finial left"></div>
+                    <div class="roller-cylinder"></div>
+                    <div class="roller-finial right"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Theme & Open Style Dock -->
+    <div class="floating-style-dock" id="floatingStyleDock">
+        <div class="floating-styles-menu" id="floatingStylesMenu">
+            <div style="color:#FFD700;font-size:0.82rem;font-weight:700;padding-bottom:6px;border-bottom:1px solid rgba(212,175,55,0.3);margin-bottom:4px;">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> ओपनिंग स्टाईल बदला:
+            </div>
+            <button type="button" class="menu-item-btn" data-reopen="envelope-wax">💌 १. मेणाची मुद्रा (Wax Seal)</button>
+            <button type="button" class="menu-item-btn" data-reopen="temple-doors">🚪 २. मंदिर महाद्वार (Doors)</button>
+            <button type="button" class="menu-item-btn" data-reopen="royal-scroll">📜 ३. शाही फर्मान (Scroll)</button>
+            <button type="button" class="menu-item-btn" data-reopen="silk-curtains">🎭 ४. रेशमी पडदा (Curtains)</button>
+            <button type="button" class="menu-item-btn" data-reopen="book-flip">📖 ५. ३D पत्रिका (Book)</button>
+            <button type="button" class="menu-item-btn" data-reopen="shagun-box">🎁 ६. शगुन पेटी (Jewel Box)</button>
+            <div style="color:#FFD700;font-size:0.82rem;font-weight:700;padding:6px 0;border-top:1px solid rgba(212,175,55,0.3);margin-top:4px;">
+                <i class="fa-solid fa-palette"></i> भारतीय संस्कृती थीम्स:
+            </div>
+            <button type="button" class="menu-item-btn" id="btnOpenThemeModal">🎨 सर्व २० थीम्स गॅलरी पहा</button>
+            <a href="admin.html" class="menu-item-btn" style="color:#4ADE80;font-weight:700;"><i class="fa-solid fa-gear"></i> ⚙️ ॲडमिन कंट्रोल पॅनेल</a>
+        </div>
+
+        <button type="button" class="dock-trigger-btn" id="btnToggleFloatingMenu">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>स्टाईल व थीम्स बदला</span>
+        </button>
+    </div>
+
+    <!-- 20 CULTURAL THEMES MODAL -->
+    <div id="themesModal" class="invitation-gate-overlay gate-dismissed">
+        <div style="background:#FFFDF9; border:3px double #D4AF37; border-radius:18px; max-width:900px; width:95%; max-height:85vh; overflow-y:auto; padding:25px; box-shadow:0 20px 60px rgba(0,0,0,0.7); position:relative;">
+            <button type="button" id="btnCloseThemeModal" style="position:absolute; top:15px; right:15px; background:transparent; border:none; font-size:1.6rem; cursor:pointer; color:#800020;">&times;</button>
+            <div style="text-align:center; margin-bottom:20px;">
+                <h2 style="font-family:'Rozha One',serif; color:#800020; font-size:1.8rem;">॥ २० भारतीय संस्कृती विवाह थीम्स ॥</h2>
+                <p style="color:#666; font-size:0.9rem;">आपल्या आवडीनुसार संपूर्ण विवाह वेबसाईटचा थाट त्वरित बदला</p>
+            </div>
+            <div id="themeCardsGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:16px;">
+                <!-- Dynamically rendered via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Toast Container -->
+    <div id="floatingToast" style="display:none;"></div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+    <script src="i18n_translations.js"></script>
+    <script src="language_engine.js"></script>
+    <script src="indian_culture_engine.js"></script>
+</body>
+</html>

@@ -1,0 +1,451 @@
+/* ==========================================================================
+   themes_indian.css - 20 Authentic Indian Cultural Themes & Regional Styles
+   Covers: Rajputana, South Indian Kalyanam, Punjabi Anand Karaj, Bengali Biye,
+   Gujarati Vivah, Kerala Kasavu, Marathi Peshwai, Kashmiri Chinar, Awadhi Nawabi,
+   Marwari Bandhej, Telugu Pelli, Odia Jagannath, Goan Coastal, Peacock Regal,
+   Vintage Farman, Sacred Havan, Bollywood Glam, Haldi Sunshine, Modern Minimal,
+   Ashtavinayak Divine.
+   ========================================================================== */
+
+/* 1. Royal Rajputana & Mewar Palace (Rajasthani) */
+body[data-theme="royal-rajputana"] {
+    --paithani-gold: #D4AF37;
+    --paithani-gold-light: #FDF3D8;
+    --paithani-gold-dark: #996515;
+    --royal-maroon: #8B0000;
+    --kumkum-red: #B22222;
+    --peacock-green: #B8860B;
+    --cream-parchment: #FFF9F0;
+    --cream-warm: #FBF0DF;
+    --text-dark: #2A0808;
+    --font-heading: 'Rozha One', serif;
+}
+body[data-theme="royal-rajputana"] .top-announcement {
+    background: linear-gradient(90deg, #8B0000, #B22222, #8B0000);
+    border-bottom: 2px solid #D4AF37;
+}
+body[data-theme="royal-rajputana"] .hero-section {
+    background: radial-gradient(circle at 50% 20%, #FFF5E6 0%, #FDF0DF 60%, #FFF9F0 100%);
+}
+
+/* 2. South Indian Vedic Kalyanam (Tamil & Telugu) */
+body[data-theme="south-kalyanam"] {
+    --paithani-gold: #C5A059;
+    --paithani-gold-light: #FBF4DE;
+    --paithani-gold-dark: #8C6D1F;
+    --royal-maroon: #7B1113;
+    --kumkum-red: #A62B2B;
+    --peacock-green: #1B4D3E;
+    --cream-parchment: #FFFDF6;
+    --cream-warm: #F8F2DF;
+    --text-dark: #24140F;
+    --font-heading: 'Rozha One', 'Cinzel', serif;
+}
+body[data-theme="south-kalyanam"] .top-announcement {
+    background: linear-gradient(90deg, #7B1113, #1B4D3E, #7B1113);
+    border-bottom: 2px solid #C5A059;
+}
+body[data-theme="south-kalyanam"] .hero-section {
+    background: radial-gradient(circle at 50% 20%, #FFFBF0 0%, #F8F2DF 60%, #FFFDF6 100%);
+}
+
+/* 3. Punjabi Shahi Anand Karaj & Bhangra */
+body[data-theme="punjabi-anand-karaj"] {
+    --paithani-gold: #FFA000;
+    --paithani-gold-light: #FFF8E1;
+    --paithani-gold-dark: #C67100;
+    --royal-maroon: #D81B60;
+    --kumkum-red: #E91E63;
+    --peacock-green: #00897B;
+    --cream-parchment: #FFFBF5;
+    --cream-warm: #FFF0E0;
+    --text-dark: #2B0A1A;
+    --font-heading: 'Yatra One', cursive;
+}
+body[data-theme="punjabi-anand-karaj"] .top-announcement {
+    background: linear-gradient(90deg, #D81B60, #FFA000, #D81B60);
+    border-bottom: 2px solid #FFD54F;
+}
+body[data-theme="punjabi-anand-karaj"] .hero-section {
+    background: radial-gradient(circle at 50% 20%, #FFF8E7 0%, #FFE8E8 60%, #FFFBF5 100%);
+}
+
+/* 4. Bengali Shubh Drishti & Biye */
+body[data-theme="bengali-biye"] {
+    --paithani-gold: #FFD700;
+    --paithani-gold-light: #FFFDE7;
+    --paithani-gold-dark: #C79A00;
+    --royal-maroon: #A30000;
+    --kumkum-red: #C62828;
+    --peacock-green: #2E7D32;
+    --cream-parchment: #FFFDF8;
+    --cream-warm: #FFF5E8;
+    --text-dark: #260A0A;
+    --font-heading: 'Rozha One', serif;
+}
+body[data-theme="bengali-biye"] .top-announcement {
+    background: linear-gradient(90deg, #A30000, #C62828, #A30000);
+    border-bottom: 2px solid #FFD700;
+}
+body[data-theme="bengali-biye"] .hero-section {
+    background: radial-gradient(circle at 50% 20%, #FFF9F5 0%, #FFF0EA 60%, #FFFDF8 100%);
+}
+
+/* 5. Gujarati Vivah & Patola Raas */
+body[data-theme="gujarati-lagna"] {
+    --paithani-gold: #E67E22;
+    --paithani-gold-light: #FDEBD0;
+    --paithani-gold-dark: #A04000;
+    --royal-maroon: #C0392B;
+    --kumkum-red: #D35400;
+    --peacock-green: #27AE60;
+    --cream-parchment: #FFFBF2;
+    --cream-warm: #FEF3DE;
+    --text-dark: #331508;
+    --font-heading: 'Yatra One', cursive;
+}
+body[data-theme="gujarati-lagna"] .top-announcement {
+    background: linear-gradient(90deg, #C0392B, #E67E22, #C0392B);
+    border-bottom: 2px solid #F39C12;
+}
+body[data-theme="gujarati-lagna"] .hero-section {
+    background: radial-gradient(circle at 50% 20%, #FFF8EA 0%, #FEF1D8 60%, #FFFBF2 100%);
+}
+
+/* 6. Kerala Kasavu & God's Own Vivaham */
+body[data-theme="kerala-kasavu"] {
+    --paithani-gold: #D4AF37;
+    --paithani-gold-light: #FBF6E9;
+    --paithani-gold-dark: #997300;
+    --royal-maroon: #1A4D2E;
+    --kumkum-red: #2D6A4F;
+    --peacock-green: #4F772D;
+    --cream-parchment: #FCFBF7;
+    --cream-warm: #F4F6F0;
+    --text-dark: #132A13;
+    --font-heading: 'Rozha One', serif;
+}
+body[data-theme="kerala-kasavu"] .top-announcement {
+    background: linear-gradient(90deg, #1A4D2E, #2D6A4F, #1A4D2E);
+    border-bottom: 2px solid #D4AF37;
+}
+body[data-theme="kerala-kasavu"] .hero-section {
+    background: radial-gradient(circle at 50% 20%, #F9FBF7 0%, #EFF5EE 60%, #FCFBF7 100%);
+}
+
+/* 7. Royal Marathi Peshwai & Paithani (Already in style.css, reinforced here) */
+body[data-theme="royal-paithani"] {
+    --paithani-gold: #D4AF37;
+    --paithani-gold-light: #F9E79F;
+    --paithani-gold-dark: #996515;
+    --royal-maroon: #800020;
+    --kumkum-red: #A81B27;
+    --peacock-green: #0E4D45;
+    --cream-parchment: #FFF9EC;
+    --cream-warm: #FAF4EB;
+    --text-dark: #2C221E;
+    --font-heading: 'Rozha One', 'Yatra One', serif;
+}
+
+/* 8. Kashmiri Pashmina & Chinar Valley */
+body[data-theme="kashmiri-chinar"] {
+    --paithani-gold: #E5A93B;
+    --paithani-gold-light: #FDF3E3;
+    --paithani-gold-dark: #A56D14;
+    --royal-maroon: #B23A22;
+    --kumkum-red: #C85A32;
+    --peacock-green: #4A6B82;
+    --cream-parchment: #FDFBF7;
+    --cream-warm: #FAF1E4;
+    --text-dark: #2B1510;
+    --font-heading: 'Tiro Devanagari Marathi', serif;
+}
+body[data-theme="kashmiri-chinar"] .top-announcement {
+    background: linear-gradient(90deg, #B23A22, #C85A32, #B23A22);
+    border-bottom: 2px solid #E5A93B;
+}
+body[data-theme="kashmiri-chinar"] .hero-section {
+    background: radial-gradient(circle at 50% 20%, #FFF7EE 0%, #FBF0DF 60%, #FDFBF7 100%);
+}
+
+/* 9. Awadhi & Mughal Shahi Dastarkhwan */
+body[data-theme="awadhi-nawabi"] {
+    --paithani-gold: #C5A059;
+    --paithani-gold-light: #FAF4E6;
+    --paithani-gold-dark: #8C6F2A;
+    --royal-maroon: #0F4C3A;
+    --kumkum-red: #1B6553;
+    --peacock-green: #2A9D8F;
+    --cream-parchment: #FAF8F5;
+    --cream-warm: #EDF4EE;
+    --text-dark: #112820;
+    --font-heading: 'Rozha One', serif;
+}
+body[data-theme="awadhi-nawabi"] .top-announcement {
+    background: linear-gradient(90deg, #0F4C3A, #1B6553, #0F4C3A);
+    border-bottom: 2px solid #C5A059;
+}
+body[data-theme="awadhi-nawabi"] .hero-section {
+    background: radial-gradient(circle at 50% 20%, #F5FBF8 0%, #ECF6F1 60%, #FAF8F5 100%);
+}
+
+/* 10. Marwari Bandhej & Rajwada Gota Patti */
+body[data-theme="marwari-bandhej"] {
+    --paithani-gold: #F39C12;
+    --paithani-gold-light: #FEF9E7;
+    --paithani-gold-dark: #B9770E;
+    --royal-maroon: #C0392B;
+    --kumkum-red: #E74C3C;
+    --peacock-green: #8E44AD;
+    --cream-parchment: #FFF9F2;
+    --cream-warm: #FDEBD0;
+    --text-dark: #350F0B;
+    --font-heading: 'Yatra One', cursive;
+}
+body[data-theme="marwari-bandhej"] .top-announcement {
+    background: linear-gradient(90deg, #C0392B, #E74C3C, #C0392B);
+    border-bottom: 2px solid #F39C12;
+}
+body[data-theme="marwari-bandhej"] .hero-section {
+    background: radial-gradient(circle at 50% 20%, #FFF6EC 0%, #FEEBD7 60%, #FFF9F2 100%);
+}
+
+/* 11. Telugu Pelli Sandadi & Kalamkari */
+body[data-theme="telugu-pelli"] {
+    --paithani-gold: #D4AF37;
+    --paithani-gold-light: #FBF4E2;
+    --paithani-gold-dark: #9E7D1B;
+    --royal-maroon: #8B1E3F;
+    --kumkum-red: #A32850;
+    --peacock-green: #2C5E43;
+    --cream-parchment: #FFFDF7;
+    --cream-warm: #FAF2E8;
+    --text-dark: #280812;
+    --font-heading: 'Rozha One', serif;
+}
+body[data-theme="telugu-pelli"] .top-announcement {
+    background: linear-gradient(90deg, #8B1E3F, #A32850, #8B1E3F);
+    border-bottom: 2px solid #D4AF37;
+}
+body[data-theme="telugu-pelli"] .hero-section {
+    background: radial-gradient(circle at 50% 20%, #FFF6FA 0%, #FAEDF3 60%, #FFFDF7 100%);
+}
+
+/* 12. Odia Baula & Pattachitra Heritage */
+body[data-theme="odia-jagannath"] {
+    --paithani-gold: #E09F3E;
+    --paithani-gold-light: #FCF4E8;
+    --paithani-gold-dark: #A46917;
+    --royal-maroon: #9E2A2B;
+    --kumkum-red: #BD3A42;
+    --peacock-green: #335C67;
+    --cream-parchment: #FCF9F2;
+    --cream-warm: #F8EDE1;
+    --text-dark: #270A0B;
+    --font-heading: 'Rozha One', serif;
+}
+body[data-theme="odia-jagannath"] .top-announcement {
+    background: linear-gradient(90deg, #9E2A2B, #E09F3E, #9E2A2B);
+    border-bottom: 2px solid #FFD166;
+}
+body[data-theme="odia-jagannath"] .hero-section {
+    background: radial-gradient(circle at 50% 20%, #FFF6EC 0%, #FBF0DE 60%, #FCF9F2 100%);
+}
+
+/* 13. Goan & Konkani Coastal Vivah */
+body[data-theme="goan-coastal"] {
+    --paithani-gold: #F4A261;
+    --paithani-gold-light: #FDE8D7;
+    --paithani-gold-dark: #E76F51;
+    --royal-maroon: #0077B6;
+    --kumkum-red: #E24B70;
+    --peacock-green: #2A9D8F;
+    --cream-parchment: #F2F8F9;
+    --cream-warm: #E6F3F5;
+    --text-dark: #0A2433;
+    --font-heading: 'Poppins', sans-serif;
+}
+body[data-theme="goan-coastal"] .top-announcement {
+    background: linear-gradient(90deg, #0077B6, #023E8A, #0077B6);
+    border-bottom: 2px solid #F4A261;
+}
+body[data-theme="goan-coastal"] .hero-section {
+    background: radial-gradient(circle at 50% 20%, #E8F6FA 0%, #DEF0F5 60%, #F2F8F9 100%);
+}
+
+/* 14. Vrindavan Mayur & Divine Flute (Peacock Regal) */
+body[data-theme="peacock-regal"] {
+    --paithani-gold: #EE9B00;
+    --paithani-gold-light: #FCF3DB;
+    --paithani-gold-dark: #CA6702;
+    --royal-maroon: #005F73;
+    --kumkum-red: #0A9396;
+    --peacock-green: #94D2BD;
+    --cream-parchment: #F2FAF9;
+    --cream-warm: #E2F2F0;
+    --text-dark: #00272D;
+    --font-heading: 'Rozha One', serif;
+}
+body[data-theme="peacock-regal"] .top-announcement {
+    background: linear-gradient(90deg, #005F73, #0A9396, #005F73);
+    border-bottom: 2px solid #EE9B00;
+}
+body[data-theme="peacock-regal"] .hero-section {
+    background: radial-gradient(circle at 50% 20%, #EBF7F6 0%, #DFF2F0 60%, #F2FAF9 100%);
+}
+
+/* 15. Vintage Shahi Farman / Royal Decree (in style.css, reinforced) */
+body[data-theme="vintage-farman"] {
+    --paithani-gold: #C5A059;
+    --paithani-gold-light: #FAF4E6;
+    --paithani-gold-dark: #8C6F2A;
+    --royal-maroon: #5D4037;
+    --kumkum-red: #795548;
+    --peacock-green: #8D6E63;
+    --cream-parchment: #F7F3EB;
+    --cream-warm: #EFE9DD;
+    --text-dark: #2A1C16;
+    --font-heading: 'Rozha One', serif;
+}
+
+/* 16. Sacred Vedic Agni & Sandalwood Havan */
+body[data-theme="sacred-havan"] {
+    --paithani-gold: #E65100;
+    --paithani-gold-light: #FEEFE6;
+    --paithani-gold-dark: #BF360C;
+    --royal-maroon: #B71C1C;
+    --kumkum-red: #D84315;
+    --peacock-green: #FF8F00;
+    --cream-parchment: #FFFBF5;
+    --cream-warm: #FDEEE4;
+    --text-dark: #330A0A;
+    --font-heading: 'Tiro Devanagari Marathi', serif;
+}
+body[data-theme="sacred-havan"] .top-announcement {
+    background: linear-gradient(90deg, #B71C1C, #E65100, #B71C1C);
+    border-bottom: 2px solid #FF8F00;
+}
+body[data-theme="sacred-havan"] .hero-section {
+    background: radial-gradient(circle at 50% 20%, #FFF5ED 0%, #FEECE0 60%, #FFFBF5 100%);
+}
+
+/* 17. Starlight Sangeet & Bollywood Glam */
+body[data-theme="bollywood-glam"] {
+    --paithani-gold: #D4AF37;
+    --paithani-gold-light: #FAF3DE;
+    --paithani-gold-dark: #9A7718;
+    --royal-maroon: #1A1A2E;
+    --kumkum-red: #E94560;
+    --peacock-green: #0F3460;
+    --cream-parchment: #F5F5FA;
+    --cream-warm: #E9EAF5;
+    --text-dark: #0E0E1A;
+    --font-heading: 'Rozha One', serif;
+}
+body[data-theme="bollywood-glam"] .top-announcement {
+    background: linear-gradient(90deg, #1A1A2E, #0F3460, #1A1A2E);
+    border-bottom: 2px solid #D4AF37;
+}
+body[data-theme="bollywood-glam"] .hero-section {
+    background: radial-gradient(circle at 50% 20%, #F0F0FA 0%, #E6E7F8 60%, #F5F5FA 100%);
+}
+
+/* 18. Haldi Sunshine & Marigold Utsav (in style.css, reinforced) */
+body[data-theme="haldi-sunshine"] {
+    --paithani-gold: #FFB703;
+    --paithani-gold-light: #FFF8CC;
+    --paithani-gold-dark: #C98200;
+    --royal-maroon: #D97706;
+    --kumkum-red: #F59E0B;
+    --peacock-green: #2B580C;
+    --cream-parchment: #FFFBEB;
+    --cream-warm: #FEF3C7;
+    --text-dark: #2C221E;
+    --font-heading: 'Yatra One', cursive;
+}
+
+/* 19. Modern Indo-Western Luxury Minimalist (in style.css, reinforced) */
+body[data-theme="modern-minimal"] {
+    --paithani-gold: #B76E79;
+    --paithani-gold-light: #F5EBEB;
+    --paithani-gold-dark: #93505B;
+    --royal-maroon: #5A3D31;
+    --kumkum-red: #B76E79;
+    --peacock-green: #2C3E50;
+    --cream-parchment: #FCF9F8;
+    --cream-warm: #F7EFEF;
+    --text-dark: #2C3E50;
+    --font-heading: 'Poppins', sans-serif;
+}
+
+/* 21. Studio Ghibli Magical Dreamscape & Royal Indian Fairytale */
+body[data-theme="ghibli-fairytale"],
+body[data-theme="royal-paithani"],
+body[data-theme="royal-rajputana"] {
+    --paithani-gold: #D4AF37;
+    --paithani-gold-light: #FEF9E7;
+    --paithani-gold-dark: #996515;
+    --royal-maroon: #7A0C1E;
+    --kumkum-red: #A81B27;
+    --peacock-green: #2E6F56;
+    --cream-parchment: #FFFDF9;
+    --cream-warm: #FAF4EB;
+    --cream-card: rgba(255, 255, 255, 0.92);
+    --text-dark: #2C221E;
+    --text-muted: #6B5B53;
+    --font-heading: 'Rozha One', 'Cinzel', serif;
+}
+
+body[data-theme="ghibli-fairytale"] .top-announcement,
+body[data-theme="royal-paithani"] .top-announcement,
+body[data-theme="royal-rajputana"] .top-announcement {
+    background: linear-gradient(90deg, #7A0C1E 0%, #B22222 50%, #7A0C1E 100%);
+    border-bottom: 2px solid #D4AF37;
+    box-shadow: 0 4px 15px rgba(122, 12, 30, 0.2);
+}
+
+body[data-theme="ghibli-fairytale"] .hero-section,
+body[data-theme="royal-paithani"] .hero-section,
+body[data-theme="royal-rajputana"] .hero-section {
+    background: radial-gradient(circle at 50% 25%, #FFF8EA 0%, #FDF2E2 50%, #FFFDF9 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Glassmorphic Ghibli Cards for All Main Themes */
+body[data-theme="ghibli-fairytale"] .couple-card,
+body[data-theme="ghibli-fairytale"] .ceremony-card,
+body[data-theme="ghibli-fairytale"] .timeline-card,
+body[data-theme="ghibli-fairytale"] .saptapadi-card,
+body[data-theme="ghibli-fairytale"] .gallery-item,
+body[data-theme="ghibli-fairytale"] .dresscode-card,
+body[data-theme="ghibli-fairytale"] .rsvp-container,
+body[data-theme="royal-paithani"] .couple-card,
+body[data-theme="royal-paithani"] .ceremony-card,
+body[data-theme="royal-paithani"] .timeline-card,
+body[data-theme="royal-paithani"] .saptapadi-card,
+body[data-theme="royal-paithani"] .gallery-item,
+body[data-theme="royal-paithani"] .dresscode-card,
+body[data-theme="royal-paithani"] .rsvp-container,
+body[data-theme="royal-rajputana"] .couple-card,
+body[data-theme="royal-rajputana"] .ceremony-card,
+body[data-theme="royal-rajputana"] .timeline-card,
+body[data-theme="royal-rajputana"] .saptapadi-card,
+body[data-theme="royal-rajputana"] .gallery-item,
+body[data-theme="royal-rajputana"] .dresscode-card,
+body[data-theme="royal-rajputana"] .rsvp-container {
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(212, 175, 55, 0.4) !important;
+    box-shadow: 0 12px 35px rgba(180, 140, 100, 0.08) !important;
+    border-radius: 20px !important;
+    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+body[data-theme="ghibli-fairytale"] .ceremony-card:hover,
+body[data-theme="royal-paithani"] .ceremony-card:hover,
+body[data-theme="royal-rajputana"] .ceremony-card:hover {
+    transform: translateY(-6px) scale(1.01) !important;
+    box-shadow: 0 20px 45px rgba(212, 175, 55, 0.22) !important;
+    border-color: #D4AF37 !important;
+}

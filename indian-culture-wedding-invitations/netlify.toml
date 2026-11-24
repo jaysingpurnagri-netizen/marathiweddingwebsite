@@ -1,0 +1,27 @@
+[build]
+  publish = "."
+
+[[redirects]]
+  from = "/admin"
+  to = "/admin.html"
+  status = 200
+
+[[redirects]]
+  from = "/api/websites"
+  to = "/websites/index.json"
+  status = 200
+
+[[redirects]]
+  from = "/api/settings"
+  to = "/settings.json"
+  status = 200
+
+[[redirects]]
+  from = "/api/rsvp"
+  to = "/rsvps.json"
+  status = 200
+
+[[redirects]]
+  from = "/api/wishes"
+  to = "/wishes.json"
+  status = 200
