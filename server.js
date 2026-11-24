@@ -1008,8 +1008,16 @@ const server = http.createServer((req, res) => {
   let reqPath = pathname;
   if (reqPath === '/' || reqPath === '') {
     const clientParam = query.get('client') || query.get('site') || query.get('id');
+
+    // If no client specified, redirect to admin panel
+    if (!clientParam) {
+      res.writeHead(302, { 'Location': '/admin' });
+      res.end();
+      return;
+    }
+
     const index = getClientIndex();
-    const targetSlug = clientParam || index.defaultClientId || 'aaditi-rohan';
+    const targetSlug = clientParam;
     const clientSettings = getClientSettings(targetSlug);
 
     let indexHtml = fs.readFileSync(path.join(PUBLIC_DIR, 'index.html'), 'utf8');

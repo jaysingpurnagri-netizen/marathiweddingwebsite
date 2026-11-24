@@ -1303,9 +1303,9 @@ async function downloadNetlifyZip() {
         }
     }
 
-    // Static bundle download fallback (100% works without backend 404)
+    // Server-side ZIP download fallback
     const a = document.createElement('a');
-    a.href = 'indian-culture-wedding-invitations.zip';
+    a.href = `/api/download-zip?client=${encodeURIComponent(activeWebsiteId)}`;
     a.download = `wedding_website_${activeWebsiteId}_netlify.zip`;
     document.body.appendChild(a);
     a.click();
@@ -1315,33 +1315,74 @@ async function downloadNetlifyZip() {
 
 async function downloadSingleHtml() {
     showToast('📄 सिंगल लग्नपत्रिका HTML तयार होत आहे...');
+    const slug = activeWebsiteId || 'aaditi-rohan';
+
+    // METHOD 1: Use server-side compiled HTML (best — inlines all CSS/JS + correct client data)
+    try {
+        const res = await fetch(`/api/download-html?client=${encodeURIComponent(slug)}&_t=${Date.now()}`);
+        if (res.ok) {
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `wedding_invitation_${slug}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('✓ सिंगल लग्नपत्रिका HTML यशस्वीरीत्या डाऊनलोड झाली!');
+            return;
+        }
+    } catch(e) {
+        console.warn('Server download-html failed, trying client-side build:', e);
+    }
+
+    // METHOD 2: Client-side build — fetch index.html + inline CSS/JS manually
     try {
         let html = '';
         try {
-            const res = await fetch('wedding_invitation.html?_t=' + Date.now());
-            if (res.ok) html = await res.text();
+            const resIndex = await fetch('index.html?_t=' + Date.now());
+            if (resIndex.ok) html = await resIndex.text();
         } catch(e) {}
 
-        if (!html) {
-            try {
-                const resIndex = await fetch('index.html?_t=' + Date.now());
-                if (resIndex.ok) html = await resIndex.text();
-            } catch(e) {}
-        }
-
         if (html) {
-            const settingsScript = `\n    <!-- Preloaded Wedding Configurations (Offline Standalone) -->\n    <script>\n        window.PRELOADED_WEDDING_SETTINGS = ${JSON.stringify(weddingSettings, null, 2)};\n    <\/script>\n`;
+            // Inject client settings
+            const settingsScript = `\n    <!-- Preloaded Wedding Configurations (Offline Standalone) -->\n    <script>\n        window.ACTIVE_CLIENT_SLUG = "${slug}";\n        window.PRELOADED_WEDDING_SETTINGS = ${JSON.stringify(weddingSettings, null, 2)};\n    <\/script>\n`;
             if (html.includes('window.PRELOADED_WEDDING_SETTINGS')) {
                 html = html.replace(/window\.PRELOADED_WEDDING_SETTINGS\s*=\s*\{[\s\S]*?\};/, `window.PRELOADED_WEDDING_SETTINGS = ${JSON.stringify(weddingSettings, null, 2)};`);
             } else {
                 html = html.replace('</head>', settingsScript + '</head>');
             }
 
+            // Inline CSS files for offline use
+            const cssFiles = ['style.css', 'themes_indian.css', 'invitation_open_styles.css', 'indian_culture_features.css'];
+            for (const cssFile of cssFiles) {
+                try {
+                    const cssRes = await fetch(cssFile + '?_t=' + Date.now());
+                    if (cssRes.ok) {
+                        const cssText = await cssRes.text();
+                        html = html.replace(`<link rel="stylesheet" href="${cssFile}">`, `<style>\n/* --- ${cssFile} --- */\n${cssText}\n</style>`);
+                    }
+                } catch(e) {}
+            }
+
+            // Inline JS files for offline use
+            const jsFiles = ['script.js', 'i18n_translations.js', 'language_engine.js', 'indian_culture_engine.js'];
+            for (const jsFile of jsFiles) {
+                try {
+                    const jsRes = await fetch(jsFile + '?_t=' + Date.now());
+                    if (jsRes.ok) {
+                        const jsText = await jsRes.text();
+                        html = html.replace(`<script src="${jsFile}"></script>`, `<script>\n// --- ${jsFile} ---\n${jsText}\n</script>`);
+                    }
+                } catch(e) {}
+            }
+
             const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `wedding_invitation_${activeWebsiteId}.html`;
+            a.download = `wedding_invitation_${slug}.html`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1350,13 +1391,13 @@ async function downloadSingleHtml() {
             return;
         }
     } catch(err) {
-        console.warn('Client HTML build error, falling back to static file:', err);
+        console.warn('Client HTML build error:', err);
     }
 
-    // Static HTML fallback (100% works without backend 404)
+    // METHOD 3: Last resort — direct file download
     const a = document.createElement('a');
-    a.href = 'wedding_invitation.html';
-    a.download = `wedding_invitation_${activeWebsiteId}.html`;
+    a.href = `/api/download-html?client=${encodeURIComponent(slug)}`;
+    a.download = `wedding_invitation_${slug}.html`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
