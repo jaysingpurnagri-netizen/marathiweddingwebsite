@@ -1,0 +1,44 @@
+# Node
+node_modules/
+
+# Backups (keep locally, don't push to git)
+backups/
+
+# Duplicate standalone package folder (already in .zip)
+indian-culture-wedding-invitations/
+
+# Large zip package (optional - can be rebuilt with build_standalone_invitation.js)
+indian-culture-wedding-invitations.zip
+
+# Large standalone HTML (can be rebuilt)
+wedding_invitation.html
+
+# Build/test/debug scripts (not needed for deployment)
+bake_helper.js
+build_clean_admin.js
+build_standalone_invitation.js
+check_admin_bottom.js
+final_health_check.js
+package_project.js
+read_admin_styles.js
+read_admin_styles_2.js
+read_admin_tab_templates.js
+read_build_standalone.js
+test_multitenant_e2e.js
+test_verification.js
+validate_syntax.js
+verify_ids.js
+write_unified_admin_js.js
+migrate_to_multitenant.js
+
+# Uploads (user-uploaded media, created at runtime)
+uploads/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/

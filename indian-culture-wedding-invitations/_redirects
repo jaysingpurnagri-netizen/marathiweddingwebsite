@@ -1,5 +1,0 @@
-/admin /admin.html 200
-/api/websites /websites/index.json 200
-/api/settings /settings.json 200
-/api/rsvp /rsvps.json 200
-/api/wishes /wishes.json 200

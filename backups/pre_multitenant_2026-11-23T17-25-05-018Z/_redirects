@@ -1,8 +1,0 @@
-/admin  /admin.html  200
-/api/download-zip  /indian-culture-wedding-invitations.zip  302
-/api/download-html  /wedding_invitation.html  302
-/api/*  /.netlify/functions/api/:splat  200
-/api/websites  /websites/index.json  200
-/api/settings  /settings.json  200
-/api/rsvp  /rsvps.json  200
-/api/wishes  /wishes.json  200

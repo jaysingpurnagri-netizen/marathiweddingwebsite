@@ -1,5 +1,0 @@
-file 'C:/Users/Aspire 3/.gemini/antigravity/scratch/marathi-wedding-website/assets/video/scene1_sahyadri.mp4'
-file 'C:/Users/Aspire 3/.gemini/antigravity/scratch/marathi-wedding-website/assets/video/scene2_sakharpuda.mp4'
-file 'C:/Users/Aspire 3/.gemini/antigravity/scratch/marathi-wedding-website/assets/video/scene3_halad.mp4'
-file 'C:/Users/Aspire 3/.gemini/antigravity/scratch/marathi-wedding-website/assets/video/scene4_saptapadi.mp4'
-file 'C:/Users/Aspire 3/.gemini/antigravity/scratch/marathi-wedding-website/assets/video/scene5_hero.mp4'

@@ -1,0 +1,15 @@
+{
+  "name": "marathi-wedding-website",
+  "version": "2.0.0",
+  "description": "Multi-tenant Marathi Wedding Invitation Platform - शुभ विवाह सस्नेह आमंत्रण",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test_multitenant_e2e.js"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": ["wedding", "marathi", "invitation", "multi-tenant"],
+  "license": "ISC"
+}
