@@ -199,7 +199,10 @@
     function initOpeningStyles() {
         // Read active opening style from settings or localStorage
         const storedStyle = localStorage.getItem('weddingOpeningStyle');
-        const defaultStyle = (window.currentSettings && window.currentSettings.openingStyle) ? window.currentSettings.openingStyle : 'envelope-wax';
+        const preloaded = window.PRELOADED_WEDDING_SETTINGS || {};
+        const defaultStyle = (window.currentSettings && window.currentSettings.openingStyle)
+            ? window.currentSettings.openingStyle
+            : (preloaded.openingStyle || 'envelope-wax');
         currentOpenStyle = storedStyle || defaultStyle;
 
         // Activate matching style in dock
@@ -836,6 +839,12 @@
             initDigitalShagun(settings);
             initAartiAndBaraat(settings);
             renderDressCode(settings.dressCode);
+
+            // Update opening style if changed
+            if (settings.openingStyle && settings.openingStyle !== currentOpenStyle) {
+                currentOpenStyle = settings.openingStyle;
+                switchOpenStyleStage(currentOpenStyle);
+            }
 
             // Update couple names in entrance stages
             const g = settings.general || {};

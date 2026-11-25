@@ -986,6 +986,16 @@ async function submitCreateWebsite() {
         return;
     }
 
+    if (window.location.protocol === 'file:') {
+        showError('नवीन क्लायंट वेबसाईटसाठी सर्व्हर आवश्यक आहे. कृपया /admin सर्व्हर पत्त्यावरून उघडा.');
+        return;
+    }
+
+    // Reserve a browser tab during the click so the live invitation can open
+    // after the server confirms the new client.
+    let websitePreviewWindow = null;
+    try { websitePreviewWindow = window.open('about:blank', '_blank'); } catch (_) {}
+
     isCreatingWebsite = true;
     if (btnSubmit) {
         btnSubmit.disabled = true;
@@ -1035,6 +1045,8 @@ async function submitCreateWebsite() {
         newSettings.templateId = theme;
         newSettings.openingStyle = opening;
         newSettings.activeLanguage = lang;
+        newSettings.guestLanguages = [lang];
+        newSettings.allowGuestLanguageSwitch = false;
         newSettings.general = newSettings.general || {};
         newSettings.general.brideName = bride;
         newSettings.general.brideSalutation = 'चि. सौ. कां.';
@@ -1067,33 +1079,27 @@ async function submitCreateWebsite() {
             updatedAt: new Date().toISOString()
         };
 
-        // 1. Guaranteed offline persistence
+        // A live invitation must be saved on the server before it is shown as created.
+        const serverResponse = await fetch('/api/clients/create', {
+                method: 'POST',
+                headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
+                body: JSON.stringify({ ...newSiteEntry, initialSettings: newSettings })
+        });
+        let serverResult = {};
+        try { serverResult = await serverResponse.json(); } catch (_) {}
+        if (!serverResponse.ok || serverResult.success !== true) {
+            throw new Error(serverResult.error || 'सर्व्हरवर क्लायंट सेव्ह होऊ शकला नाही.');
+        }
+
+        // Update browser cache only after the server confirms creation.
         try {
-            let localSites = JSON.parse(localStorage.getItem('wedding_websites_list') || '[]');
+            const localSites = JSON.parse(localStorage.getItem('wedding_websites_list') || '[]');
             const existIdx = localSites.findIndex(s => s.id === slug || s.slug === slug);
             if (existIdx >= 0) localSites[existIdx] = newSiteEntry;
             else localSites.push(newSiteEntry);
             localStorage.setItem('wedding_websites_list', JSON.stringify(localSites));
             localStorage.setItem('wedding_settings_' + slug, JSON.stringify(newSettings));
-            localStorage.setItem('wedding_active_slug', slug);
-            localStorage.setItem('wedding_settings', JSON.stringify(newSettings));
-        } catch(err) {
-            console.warn('LocalStorage error:', err);
-        }
-
-        // 2. Server persistence if connected
-        try {
-            await fetch('/api/clients/create', {
-                method: 'POST',
-                headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
-                body: JSON.stringify({
-                    ...newSiteEntry,
-                    initialSettings: newSettings
-                })
-            });
-        } catch (netErr) {
-            console.log('Server not reachable or running standalone file mode, saved locally.');
-        }
+        } catch (cacheError) { console.warn('Local cache update failed:', cacheError); }
 
         // 3. Update memory state
         const existingIdx = allWebsites.findIndex(s => s.id === slug || s.slug === slug);
@@ -1112,9 +1118,18 @@ async function submitCreateWebsite() {
         // 5. Switch to newly created website immediately
         await switchWebsite(slug, true);
 
-        // 6. Show celebratory toast
+        // Open the public client invitation after switching the admin editor.
+        const clientUrl = `${window.location.origin}/c/${encodeURIComponent(slug)}`;
+        if (websitePreviewWindow && !websitePreviewWindow.closed) {
+            websitePreviewWindow.location.replace(clientUrl);
+        } else {
+            window.location.assign(clientUrl);
+        }
+
+        // Confirm the server-created client.
         showToast("🎉 '" + title + "' ही नवीन वेबसाईट यशस्वीरीत्या तयार झाली व लोड झाली!");
     } catch (err) {
+        if (websitePreviewWindow && !websitePreviewWindow.closed) websitePreviewWindow.close();
         console.error('Error in submitCreateWebsite:', err);
         showError('वेबसाईट तयार करताना अडचण आली: ' + (err.message || err));
     } finally {
@@ -2383,6 +2398,14 @@ function populateForm(s) {
     // Story quote
     setVal('storyQuoteInput', st.quote);
 
+    // Media (Audio & Video)
+    const med = s.media || {};
+    setVal('bgMusicUrl', med.backgroundAudio || med.bgMusicUrl || 'assets/audio/marathi_wedding_shehnai.mp3');
+    setVal('videoUrlInput', med.videoUrl || 'assets/video/ghibli_wedding_journey.mp4');
+    setVal('videoPosterInput', med.videoPoster || 'assets/images/hero_couple.jpg');
+    setVal('videoTitleInput', med.videoTitle || '');
+    setCheck('useGhibliVideoToggle', med.useGhibliVideo === true);
+
     // Section Visibility
     const sec = s.sections || {};
     setCheck('secShowStory', sec.showStory !== false);
@@ -2408,6 +2431,11 @@ function populateForm(s) {
 
     // Language
     setCheck('cfgAllowGuestLangSwitch', s.allowGuestLanguageSwitch !== false);
+    const primaryLanguage = ['mr', 'hi', 'en'].includes(s.activeLanguage) ? s.activeLanguage : 'mr';
+    const guestLanguages = Array.isArray(s.guestLanguages) ? s.guestLanguages : [primaryLanguage];
+    setCheck('cfgGuestLangMR', guestLanguages.includes('mr') || primaryLanguage === 'mr');
+    setCheck('cfgGuestLangHI', guestLanguages.includes('hi') || primaryLanguage === 'hi');
+    setCheck('cfgGuestLangEN', guestLanguages.includes('en') || primaryLanguage === 'en');
 
     updateLaunchTexts();
 }
@@ -2469,6 +2497,24 @@ function collectFormData() {
         groomLines: [getVal('gUkhana1'), getVal('gUkhana2'), getVal('gUkhana3'), getVal('gUkhana4')]
     };
 
+    // Media (Audio & Video) — use 'backgroundAudio' to match script.js
+    weddingSettings.media = weddingSettings.media || {};
+    const audioUrlInput = document.getElementById('bgMusicUrl');
+    const videoUrlInput = document.getElementById('videoUrlInput');
+    if (audioUrlInput) weddingSettings.media.backgroundAudio = audioUrlInput.value.trim();
+    else if (!Object.prototype.hasOwnProperty.call(weddingSettings.media, 'backgroundAudio')) {
+        weddingSettings.media.backgroundAudio = weddingSettings.media.bgMusicUrl || 'assets/audio/marathi_wedding_shehnai.mp3';
+    }
+    weddingSettings.media.bgMusicUrl = weddingSettings.media.backgroundAudio;
+    if (videoUrlInput) weddingSettings.media.videoUrl = videoUrlInput.value.trim();
+    else if (!Object.prototype.hasOwnProperty.call(weddingSettings.media, 'videoUrl')) {
+        weddingSettings.media.videoUrl = weddingSettings.media.customVideo || '';
+    }
+    const videoPosterInput = document.getElementById('videoPosterInput');
+    const videoTitleInput = document.getElementById('videoTitleInput');
+    if (videoPosterInput) weddingSettings.media.videoPoster = videoPosterInput.value.trim();
+    if (videoTitleInput) weddingSettings.media.videoTitle = videoTitleInput.value.trim();
+
     weddingSettings.shagun = {
         upiId: getVal('cfgUpiId') || 'aaditi.rohan@okaxis',
         payeeName: getVal('cfgPayeeName') || 'Aaditi & Rohan Vivah',
@@ -2484,7 +2530,11 @@ function collectFormData() {
     weddingSettings.story = weddingSettings.story || {};
     weddingSettings.story.quote = getVal('storyQuoteInput') || weddingSettings.story.quote;
 
-    weddingSettings.allowGuestLanguageSwitch = getCheck('cfgAllowGuestLangSwitch');
+    const primaryLanguage = ['mr', 'hi', 'en'].includes(weddingSettings.activeLanguage) ? weddingSettings.activeLanguage : 'mr';
+    const selectedGuestLanguages = ['mr', 'hi', 'en'].filter(lang => getCheck(`cfgGuestLang${lang.toUpperCase()}`));
+    if (!selectedGuestLanguages.includes(primaryLanguage)) selectedGuestLanguages.unshift(primaryLanguage);
+    weddingSettings.guestLanguages = selectedGuestLanguages;
+    weddingSettings.allowGuestLanguageSwitch = selectedGuestLanguages.length > 1;
 
     weddingSettings.sections = {
         showStory: getCheck('secShowStory'),
@@ -2556,6 +2606,157 @@ async function saveSettings() {
     } else {
         showToast(`✓ '${targetSlug}' चे बदल स्थानिकरित्या (LocalStorage) सुरक्षित सेव्ह झाले!`);
     }
+}
+
+function initMediaUploadControls() {
+    const controls = [
+        { kind: 'video', inputId: 'videoFileInput', dropId: 'videoDropzone', previewId: 'adminVideoPreview', pathId: 'activeVideoPath', progressId: 'videoUploadProgress', clearId: 'clearVideoBtn', maxBytes: 150 * 1024 * 1024, extensions: ['mp4', 'webm'] },
+        { kind: 'audio', inputId: 'audioFileInput', dropId: 'audioDropzone', previewId: 'adminAudioPreview', pathId: 'activeAudioPath', progressId: 'audioUploadProgress', clearId: 'clearAudioBtn', maxBytes: 50 * 1024 * 1024, extensions: ['mp3', 'wav'] }
+    ];
+
+    const previewVideo = document.getElementById('adminVideoPreview');
+    const previewAudio = document.getElementById('adminAudioPreview');
+    let resumePreviewAudio = false;
+    if (previewVideo && previewAudio) {
+        previewVideo.addEventListener('play', () => {
+            resumePreviewAudio = !previewAudio.paused;
+            previewAudio.pause();
+        });
+        const resumeAudio = () => {
+            if (resumePreviewAudio) previewAudio.play().catch(() => {});
+            resumePreviewAudio = false;
+        };
+        previewVideo.addEventListener('ended', resumeAudio);
+        previewAudio.addEventListener('play', () => {
+            if (!previewVideo.paused) previewVideo.pause();
+        });
+    }
+
+    const updatePreview = (control, url) => {
+        const preview = document.getElementById(control.previewId);
+        const source = preview?.querySelector('source');
+        const path = document.getElementById(control.pathId);
+        if (path) path.textContent = url || '—';
+        if (!preview) return;
+        preview.pause?.();
+        if (source) {
+            if (url) source.setAttribute('src', url);
+            else source.removeAttribute('src');
+        } else if (url) preview.setAttribute('src', url);
+        else preview.removeAttribute('src');
+        preview.load();
+    };
+
+    const saveMediaUrl = async (control, url) => {
+        if (!weddingSettings) weddingSettings = {};
+        weddingSettings.media = weddingSettings.media || {};
+        if (control.kind === 'video') {
+            weddingSettings.media.videoUrl = url;
+            weddingSettings.media.customVideo = url;
+            weddingSettings.media.useGhibliVideo = url === 'assets/video/ghibli_wedding_journey.mp4';
+        } else {
+            weddingSettings.media.backgroundAudio = url;
+            weddingSettings.media.bgMusicUrl = url;
+            weddingSettings.media.customAudio = url;
+        }
+        updatePreview(control, url);
+        markDirty();
+        await saveSettings();
+    };
+
+    const uploadFile = (control, file) => {
+        if (!file) return;
+        const extension = (file.name.split('.').pop() || '').toLowerCase();
+        if (!control.extensions.includes(extension)) {
+            showToast(control.kind === 'video' ? 'MP4 किंवा WebM व्हिडिओ निवडा.' : 'MP3 किंवा WAV ऑडिओ निवडा.');
+            return;
+        }
+        if (file.size > control.maxBytes) {
+            showToast(control.kind === 'video' ? 'व्हिडिओचा आकार १५० MB पेक्षा कमी ठेवा.' : 'ऑडिओचा आकार ५० MB पेक्षा कमी ठेवा.');
+            return;
+        }
+
+        const progress = document.getElementById(control.progressId);
+        const fill = progress?.querySelector('.fill');
+        progress?.classList.remove('hidden');
+        if (fill) fill.style.width = '0%';
+        const client = encodeURIComponent((activeWebsiteId || 'aaditi-rohan').replace(/[^a-z0-9_-]/gi, '_'));
+        const request = new XMLHttpRequest();
+        request.open('POST', `/api/upload?client=${client}`);
+        request.setRequestHeader('X-Filename', encodeURIComponent(file.name));
+        request.upload.addEventListener('progress', event => {
+            if (event.lengthComputable && fill) fill.style.width = `${Math.round(event.loaded / event.total * 100)}%`;
+        });
+        request.addEventListener('load', async () => {
+            progress?.classList.add('hidden');
+            try {
+                const result = JSON.parse(request.responseText || '{}');
+                if (request.status < 200 || request.status >= 300 || !result.success || !result.url) {
+                    throw new Error(result.error || 'फाइल अपलोड झाली नाही.');
+                }
+                await saveMediaUrl(control, result.url);
+                showToast(control.kind === 'video' ? '✓ व्हिडिओ अपलोड करून सेव्ह केला!' : '✓ ऑडिओ अपलोड करून सेव्ह केला!');
+            } catch (error) {
+                showToast('अपलोड अयशस्वी: ' + (error.message || error));
+            }
+        });
+        request.addEventListener('error', () => {
+            progress?.classList.add('hidden');
+            showToast('सर्व्हरशी संपर्क झाला नाही. वेबसाइट सर्व्हरवरून उघडा.');
+        });
+        request.send(file);
+    };
+
+    controls.forEach(control => {
+        const input = document.getElementById(control.inputId);
+        const dropzone = document.getElementById(control.dropId);
+        input?.addEventListener('change', () => {
+            uploadFile(control, input.files?.[0]);
+            input.value = '';
+        });
+        dropzone?.addEventListener('dragover', event => event.preventDefault());
+        dropzone?.addEventListener('drop', event => {
+            event.preventDefault();
+            uploadFile(control, event.dataTransfer?.files?.[0]);
+        });
+        document.getElementById(control.clearId)?.addEventListener('click', async () => {
+            if (!weddingSettings) weddingSettings = {};
+            weddingSettings.media = weddingSettings.media || {};
+            if (control.kind === 'video') {
+                weddingSettings.media.videoUrl = '';
+                weddingSettings.media.customVideo = '';
+                weddingSettings.media.useGhibliVideo = false;
+                const fallbackToggle = document.getElementById('useGhibliVideoToggle');
+                if (fallbackToggle) fallbackToggle.checked = false;
+            } else {
+                weddingSettings.media.backgroundAudio = '';
+                weddingSettings.media.bgMusicUrl = '';
+                weddingSettings.media.customAudio = '';
+                document.querySelectorAll('.audio-preset-card').forEach(card => card.classList.remove('active'));
+            }
+            updatePreview(control, '');
+            markDirty();
+            await saveSettings();
+            showToast(control.kind === 'video' ? '✓ व्हिडिओ काढला; व्हिडिओ विभाग पाहुण्यांना दिसणार नाही.' : '✓ ऑडिओ काढला; संगीत बटण पाहुण्यांना दिसणार नाही.');
+        });
+    });
+
+    const currentMedia = weddingSettings?.media || {};
+    updatePreview(controls[0], currentMedia.videoUrl || currentMedia.customVideo || '');
+    updatePreview(controls[1], currentMedia.backgroundAudio || currentMedia.bgMusicUrl || currentMedia.customAudio || '');
+
+    const useDefaultVideoToggle = document.getElementById('useGhibliVideoToggle');
+    useDefaultVideoToggle?.addEventListener('change', async () => {
+        if (!weddingSettings) weddingSettings = {};
+        weddingSettings.media = weddingSettings.media || {};
+        const url = useDefaultVideoToggle.checked ? 'assets/video/ghibli_wedding_journey.mp4' : '';
+        weddingSettings.media.videoUrl = url;
+        weddingSettings.media.customVideo = url;
+        weddingSettings.media.useGhibliVideo = Boolean(url);
+        updatePreview(controls[0], url);
+        markDirty();
+        await saveSettings();
+    });
 }
 
 /* ========================================================
@@ -2647,6 +2848,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await initRsvpManager(activeWebsiteId);
     await initWishesManager(activeWebsiteId);
     populateForm(weddingSettings);
+    initMediaUploadControls();
 
     // 5. Connect Command Center & Action Buttons
     const saveBtn = document.getElementById('saveAllBtn');
@@ -2881,6 +3083,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const lang = btn.getAttribute('data-set-lang') || 'mr';
             if (weddingSettings) {
                 weddingSettings.activeLanguage = lang;
+                const guestLanguageOption = document.getElementById(`cfgGuestLang${lang.toUpperCase()}`);
+                if (guestLanguageOption) guestLanguageOption.checked = true;
                 const langSelect = document.getElementById('activeLanguage');
                 if (langSelect) langSelect.value = lang;
                 markDirty();
@@ -2889,12 +3093,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
+    ['cfgGuestLangMR', 'cfgGuestLangHI', 'cfgGuestLangEN'].forEach(id => {
+        document.getElementById(id)?.addEventListener('change', markDirty);
+    });
+
     const btnSaveAudio = document.getElementById('saveAudioOnlyBtn');
     if (btnSaveAudio) {
         btnSaveAudio.addEventListener('click', () => {
             if (!weddingSettings) weddingSettings = {};
             weddingSettings.media = weddingSettings.media || {};
-            weddingSettings.media.bgMusicUrl = (document.getElementById('bgMusicUrl')?.value || '').trim();
+            const audioVal = (document.getElementById('bgMusicUrl')?.value || weddingSettings.media.backgroundAudio || weddingSettings.media.bgMusicUrl || '').trim();
+            weddingSettings.media.bgMusicUrl = audioVal;
+            weddingSettings.media.backgroundAudio = audioVal;
             saveSettings();
             showToast('✓ ऑडिओ सेटिंग्ज सेव्ह झाल्या!');
         });
@@ -2902,11 +3112,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const btnResetAudio = document.getElementById('resetAudioToDefaultBtn');
     if (btnResetAudio) {
-        btnResetAudio.addEventListener('click', () => {
+        btnResetAudio.addEventListener('click', async () => {
+            if (!weddingSettings) weddingSettings = {};
+            weddingSettings.media = weddingSettings.media || {};
+            const defaultAudio = 'assets/audio/marathi_wedding_shehnai.mp3';
             const audioInp = document.getElementById('bgMusicUrl');
-            if (audioInp) audioInp.value = 'assets/audio/marathi_wedding_shehnai.mp3';
-            if (weddingSettings && weddingSettings.media) weddingSettings.media.bgMusicUrl = 'assets/audio/marathi_wedding_shehnai.mp3';
+            if (audioInp) audioInp.value = defaultAudio;
+            weddingSettings.media.bgMusicUrl = defaultAudio;
+            weddingSettings.media.backgroundAudio = defaultAudio;
+            const preview = document.getElementById('adminAudioPreview');
+            const source = preview?.querySelector('source');
+            if (source) source.setAttribute('src', defaultAudio);
+            else if (preview) preview.setAttribute('src', defaultAudio);
+            preview?.load();
+            const path = document.getElementById('activeAudioPath');
+            if (path) path.textContent = defaultAudio;
             markDirty();
+            await saveSettings();
             showToast('✓ ऑडिओ मूळ सनई वादनावर सेट केला!');
         });
     }

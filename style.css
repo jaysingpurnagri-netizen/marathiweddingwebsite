@@ -3816,3 +3816,17 @@ body[data-theme="royal-solapuri-chadar"] .top-announcement {
 .btn-banner-close:hover {
     color: #FFF;
 }
+/* Client invitations use the admin-selected theme and opening style. */
+.open-styles-dock,
+#reopenGateBtn,
+#quickThemesBtn,
+#btnOpenThemeModal,
+#themesModal {
+    display: none !important;
+}
+
+.lang-selector-pill[hidden],
+.lang-btn[hidden],
+#toggleMusicBtn[hidden] {
+    display: none !important;
+}

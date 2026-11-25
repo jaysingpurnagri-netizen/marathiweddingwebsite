@@ -421,6 +421,7 @@ function compileClientStandaloneHtml(slug) {
     const filePath = path.join(PUBLIC_DIR, file);
     if (fs.existsSync(filePath)) {
       const content = fs.readFileSync(filePath, 'utf8');
+      html = html.replace(`<link rel="stylesheet" href="/${file}">`, `<style>\n/* --- ${file} --- */\n${content}\n</style>`);
       html = html.replace(`<link rel="stylesheet" href="${file}">`, `<style>\n/* --- ${file} --- */\n${content}\n</style>`);
     }
   });
@@ -431,6 +432,7 @@ function compileClientStandaloneHtml(slug) {
     const filePath = path.join(PUBLIC_DIR, file);
     if (fs.existsSync(filePath)) {
       const content = fs.readFileSync(filePath, 'utf8');
+      html = html.replace(`<script src="/${file}"></script>`, `<script>\n// --- ${file} ---\n${content}\n</script>`);
       html = html.replace(`<script src="${file}"></script>`, `<script>\n// --- ${file} ---\n${content}\n</script>`);
     }
   });
@@ -922,7 +924,7 @@ const server = http.createServer((req, res) => {
     req.pipe(writeStream);
 
     writeStream.on('finish', () => {
-      const publicUrl = `uploads/${clientSlug}/${rawFilename}`;
+      const publicUrl = `/uploads/${clientSlug}/${rawFilename}`;
       sendJSON(res, 200, {
         success: true,
         message: 'File uploaded successfully',

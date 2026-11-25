@@ -12,23 +12,47 @@
 
     let currentLang = 'mr';
 
+    function getLanguageSettings() {
+        return window.currentSettings || window.PRELOADED_WEDDING_SETTINGS || {};
+    }
+
+    function getAllowedLanguages() {
+        const settings = getLanguageSettings();
+        const primary = ['mr', 'hi', 'en'].includes(settings.activeLanguage) ? settings.activeLanguage : 'mr';
+        if (settings.allowGuestLanguageSwitch === false) return [primary];
+        const configured = Array.isArray(settings.guestLanguages) ? settings.guestLanguages : [primary];
+        const allowed = [...new Set(configured.filter(code => ['mr', 'hi', 'en'].includes(code)))];
+        if (!allowed.includes(primary)) allowed.unshift(primary);
+        return allowed;
+    }
+
+    function syncGuestLanguageButtons() {
+        const allowed = getAllowedLanguages();
+        document.querySelectorAll('.lang-btn[data-lang]').forEach(btn => {
+            btn.hidden = !allowed.includes(btn.getAttribute('data-lang'));
+        });
+        const pill = document.getElementById('headerLangPill');
+        if (pill) pill.hidden = allowed.length < 2;
+    }
+
     function getActiveLanguage() {
+        const allowed = getAllowedLanguages();
         // 1. URL parameter (?lang=mr|hi|en)
         const urlParams = new URLSearchParams(window.location.search);
         const urlLang = urlParams.get('lang');
-        if (urlLang && ['mr', 'hi', 'en'].includes(urlLang)) {
+        if (urlLang && allowed.includes(urlLang)) {
             return urlLang;
         }
 
         // 2. User guest choice in localStorage
         const storedUserLang = localStorage.getItem('userLanguage');
-        if (storedUserLang && ['mr', 'hi', 'en'].includes(storedUserLang)) {
+        if (storedUserLang && allowed.includes(storedUserLang)) {
             return storedUserLang;
         }
 
         // 3. Admin setting from window.currentSettings or window.PRELOADED_WEDDING_SETTINGS
-        const s = window.currentSettings || window.PRELOADED_WEDDING_SETTINGS;
-        if (s && s.activeLanguage && ['mr', 'hi', 'en'].includes(s.activeLanguage)) {
+        const s = getLanguageSettings();
+        if (s && allowed.includes(s.activeLanguage)) {
             return s.activeLanguage;
         }
 
@@ -36,6 +60,7 @@
     }
 
     function applyLanguage(langCode) {
+        if (!getAllowedLanguages().includes(langCode)) langCode = getAllowedLanguages()[0] || 'mr';
         if (!window.I18N_TRANSLATIONS || !window.I18N_TRANSLATIONS[langCode]) {
             langCode = 'mr';
         }
@@ -191,6 +216,7 @@
                 btn.classList.remove('active');
             }
         });
+        syncGuestLanguageButtons();
     }
 
     function setSectionHeader(sectionId, tag, title, desc) {
@@ -248,20 +274,6 @@
         `;
         document.head.appendChild(style);
 
-        // Bind events
-        pill.querySelectorAll('.lang-btn').forEach(b => {
-            b.addEventListener('click', () => {
-                const code = b.getAttribute('data-lang');
-                if (code) {
-                    applyLanguage(code);
-                    if (window.IndianCultureEngine && typeof window.IndianCultureEngine.showToast === 'function') {
-                        const names = { mr: 'मराठी', hi: 'हिंदी', en: 'English' };
-                        window.IndianCultureEngine.showToast(`🌐 भाषा बदलली: ${names[code] || code}`);
-                    }
-                }
-            });
-        });
-
         // Insert into header-actions
         const headerActions = document.querySelector('.header-actions');
         if (headerActions) {
@@ -274,8 +286,28 @@
     // -------------------------------------------------------------
     document.addEventListener('DOMContentLoaded', () => {
         injectLanguageSwitcherPill();
+        document.querySelectorAll('.lang-btn[data-lang]').forEach(button => {
+            if (button.dataset.languageBound === 'true') return;
+            button.dataset.languageBound = 'true';
+            button.addEventListener('click', () => {
+                const code = button.getAttribute('data-lang');
+                if (!code) return;
+                applyLanguage(code);
+                if (window.IndianCultureEngine && typeof window.IndianCultureEngine.showToast === 'function') {
+                    const names = { mr: 'मराठी', hi: 'हिंदी', en: 'English' };
+                    window.IndianCultureEngine.showToast(`🌐 भाषा बदलली: ${names[code] || code}`);
+                }
+            });
+        });
+        syncGuestLanguageButtons();
         const initialLang = getActiveLanguage();
         applyLanguage(initialLang);
+    });
+
+    document.addEventListener('wedding-settings-applied', () => {
+        syncGuestLanguageButtons();
+        const activeLanguage = getActiveLanguage();
+        if (activeLanguage !== currentLang) applyLanguage(activeLanguage);
     });
 
     window.LanguageEngine = {

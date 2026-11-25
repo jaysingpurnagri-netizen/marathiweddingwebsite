@@ -294,15 +294,19 @@ async function loadAndApplySettings() {
     applySettingsToDOM(currentSettings);
 }
 
+function toPublicAssetUrl(path) {
+    if (!path) return '';
+    if (/^(?:[a-z]+:|\/)/i.test(path)) return path;
+    return `/${path.replace(/^\.\//, '')}`;
+}
+
 function applySettingsToDOM(s) {
     window.currentSettings = s;
     if (window.IndianCultureEngine && typeof window.IndianCultureEngine.update === 'function') {
         window.IndianCultureEngine.update(s);
     }
 
-    if (s.sections) {
-        applySectionsVisibility(s.sections);
-    }
+    applySectionsVisibility(s.sections || {}, s);
 
     const urlParams = new URLSearchParams(window.location.search);
     const themeFromUrl = urlParams.get('theme') || urlParams.get('previewTheme');
@@ -372,22 +376,47 @@ function applySettingsToDOM(s) {
     // Media
     const audio = document.getElementById('weddingAudio');
     const audioSrc = document.getElementById('audioSource');
-    if (audio && audioSrc && m.backgroundAudio) {
-        if (!audioSrc.src.includes(m.backgroundAudio)) {
-            audioSrc.src = m.backgroundAudio;
+    const musicButton = document.getElementById('toggleMusicBtn');
+    const audioUrl = Object.prototype.hasOwnProperty.call(m, 'backgroundAudio') ? m.backgroundAudio : (m.bgMusicUrl || '');
+    if (audio && audioSrc) {
+        if (audioUrl) {
+            const publicAudioUrl = toPublicAssetUrl(audioUrl);
+            if (audioSrc.getAttribute('src') !== publicAudioUrl) {
+                audioSrc.setAttribute('src', publicAudioUrl);
+                audio.load();
+            }
+            if (musicButton) musicButton.hidden = false;
+        } else {
+            audio.pause();
+            audioSrc.removeAttribute('src');
             audio.load();
+            musicButton?.classList.remove('active');
+            if (musicButton) musicButton.hidden = true;
         }
     }
 
     const video = document.getElementById('weddingVideo');
-    if (video && m.videoUrl) {
-        const source = video.querySelector('source');
-        if (source && !source.src.includes(m.videoUrl)) {
-            source.src = m.videoUrl;
+    const videoSection = document.getElementById('video');
+    const videoNavLink = document.querySelector('#navMenu a[href="#video"]');
+    const videoSource = video?.querySelector('source');
+    const videoUrl = m.videoUrl || m.customVideo || (m.useGhibliVideo === false ? '' : m.defaultVideo) || '';
+    const videoVisible = s.sections?.showVideo !== false && Boolean(videoUrl);
+    if (video && videoSource && videoVisible) {
+        const publicVideoUrl = toPublicAssetUrl(videoUrl);
+        if (videoSource.getAttribute('src') !== publicVideoUrl) {
+            videoSource.setAttribute('src', publicVideoUrl);
             video.load();
         }
-        if (m.videoPoster) video.poster = m.videoPoster;
+        if (m.videoPoster) video.poster = toPublicAssetUrl(m.videoPoster);
+        else video.removeAttribute('poster');
+    } else if (video) {
+        video.pause();
+        videoSource?.removeAttribute('src');
+        video.removeAttribute('src');
+        video.load();
     }
+    if (videoSection) videoSection.style.display = videoVisible ? '' : 'none';
+    if (videoNavLink) (videoNavLink.closest('li') || videoNavLink).style.display = videoVisible ? '' : 'none';
     if (m.videoTitle) setText('dynVideoTitle', m.videoTitle);
 
     // Love Story
@@ -404,8 +433,9 @@ function applySettingsToDOM(s) {
     }
 
     // Gallery
-    if (s.gallery && Array.isArray(s.gallery)) {
-        renderGallery(s.gallery);
+    const galleryItems = Array.isArray(s.gallery) ? s.gallery : s.photos;
+    if (Array.isArray(galleryItems)) {
+        renderGallery(galleryItems);
     }
 
     // Shagun
@@ -413,10 +443,11 @@ function applySettingsToDOM(s) {
     if (shagun.payeeName) setText('dynPayeeName', shagun.payeeName);
     if (shagun.upiId) setText('dynUpiId', shagun.upiId);
     if (shagun.note) setText('dynShagunNote', shagun.note);
+
+    document.dispatchEvent(new Event('wedding-settings-applied'));
 }
 
-function applySectionsVisibility(sections) {
-    if (!sections) return;
+function applySectionsVisibility(sections, settings = {}) {
     const mapping = {
         showStory: '#story',
         showCeremonies: '#ceremonies',
@@ -433,9 +464,16 @@ function applySectionsVisibility(sections) {
         showPetals: '#petalsCanvas'
     };
 
+    const galleryItems = Array.isArray(settings.gallery) ? settings.gallery : settings.photos;
+    const availability = {
+        showStory: !Array.isArray(settings.story?.steps) || settings.story.steps.length > 0 || Boolean(settings.story?.quote),
+        showCeremonies: !Array.isArray(settings.ceremonies) || settings.ceremonies.length > 0,
+        showPhotos: !Array.isArray(galleryItems) || galleryItems.length > 0
+    };
+
     Object.keys(mapping).forEach(key => {
         const sel = mapping[key];
-        const isVisible = sections[key] !== false;
+        const isVisible = sections[key] !== false && availability[key] !== false;
         const el = document.querySelector(sel);
         if (el) {
             el.style.display = isVisible ? '' : 'none';
@@ -498,8 +536,9 @@ function renderGallery(photos) {
         const item = document.createElement('div');
         item.className = 'gallery-item';
         item.setAttribute('data-category', p.category || 'all');
+        const photoUrl = escapeHTML(toPublicAssetUrl(p.url || ''));
         item.innerHTML = `
-            <img src="${p.url}" alt="${escapeHTML(p.caption || 'Wedding Photo')}" loading="lazy">
+            <img src="${photoUrl}" alt="${escapeHTML(p.caption || 'Wedding Photo')}" loading="lazy">
             <div class="gallery-overlay">
                 <span>${escapeHTML(p.caption || '')}</span>
             </div>
@@ -545,7 +584,28 @@ function initCountdown() {
 function initAudio() {
     const audio = document.getElementById('weddingAudio');
     const toggleBtn = document.getElementById('toggleMusicBtn');
-    if (!audio || !toggleBtn) return;
+    const video = document.getElementById('weddingVideo');
+    if (!audio) return;
+
+    let resumeAudioAfterVideo = false;
+    if (video) {
+        video.addEventListener('play', () => {
+            resumeAudioAfterVideo = !audio.paused;
+            audio.pause();
+            toggleBtn?.classList.remove('active');
+        });
+        video.addEventListener('ended', () => {
+            if (resumeAudioAfterVideo) {
+                audio.play().then(() => toggleBtn?.classList.add('active')).catch(() => {});
+            }
+            resumeAudioAfterVideo = false;
+        });
+        audio.addEventListener('play', () => {
+            if (video && !video.paused) video.pause();
+        });
+    }
+
+    if (!toggleBtn) return;
 
     toggleBtn.addEventListener('click', () => {
         if (audio.paused) {
