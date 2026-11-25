@@ -70,7 +70,7 @@ const DEFAULT_SETTINGS_DATA = {
   "media": {
     "backgroundAudio": "assets/audio/marathi_wedding_shehnai.mp3",
     "audioAutoplay": false,
-    "videoUrl": "assets/video/ghibli_wedding_journey.mp4",
+    "videoUrl": "",
     "videoTitle": "आमचा मंगल विवाह प्रवास व पूर्वझलक (Wedding Cinema Trailer)",
     "videoPoster": "assets/images/hero_couple.jpg"
   },
@@ -377,7 +377,7 @@ function applySettingsToDOM(s) {
     const audio = document.getElementById('weddingAudio');
     const audioSrc = document.getElementById('audioSource');
     const musicButton = document.getElementById('toggleMusicBtn');
-    const audioUrl = Object.prototype.hasOwnProperty.call(m, 'backgroundAudio') ? m.backgroundAudio : (m.bgMusicUrl || '');
+    const audioUrl = Object.prototype.hasOwnProperty.call(m, 'backgroundAudio') ? m.backgroundAudio : (m.bgMusicUrl || m.customAudio || '');
     if (audio && audioSrc) {
         if (audioUrl) {
             const publicAudioUrl = toPublicAssetUrl(audioUrl);
@@ -398,28 +398,47 @@ function applySettingsToDOM(s) {
     const video = document.getElementById('weddingVideo');
     const videoSection = document.getElementById('video');
     const videoNavLink = document.querySelector('#navMenu a[href="#video"]');
+    const videoNavItem = document.getElementById('videoNavItem') || videoNavLink?.closest('li');
     const videoSource = video?.querySelector('source');
-    const videoUrl = m.videoUrl || m.customVideo || (m.useGhibliVideo === true ? m.defaultVideo : '') || '';
-    const videoVisible = s.sections?.showVideo !== false && Boolean(videoUrl);
-    if (video && videoSource && videoVisible) {
+    const videoUrl = String(m.videoUrl || m.customVideo || '').trim();
+    const videoConfigured = s.sections?.showVideo !== false && Boolean(videoUrl);
+    const setVideoVisible = (visible) => {
+        if (videoSection) {
+            videoSection.hidden = !visible;
+            videoSection.style.display = visible ? '' : 'none';
+        }
+        if (videoNavItem) videoNavItem.hidden = !visible;
+        if (videoNavLink) (videoNavLink.closest('li') || videoNavLink).style.display = visible ? '' : 'none';
+        const watchButton = document.getElementById('heroWatchVideoBtn');
+        if (watchButton) watchButton.hidden = !visible;
+    };
+
+    // Keep video controls hidden until the browser confirms the selected file exists.
+    setVideoVisible(false);
+    if (video && videoSource && videoConfigured) {
         const publicVideoUrl = toPublicAssetUrl(videoUrl);
+        const showLoadedVideo = () => setVideoVisible(true);
+        const hideMissingVideo = () => setVideoVisible(false);
+        video.addEventListener('loadedmetadata', showLoadedVideo, { once: true });
+        video.addEventListener('error', hideMissingVideo, { once: true });
         if (videoSource.getAttribute('src') !== publicVideoUrl) {
             videoSource.setAttribute('src', publicVideoUrl);
             video.load();
         }
         if (m.videoPoster) video.poster = toPublicAssetUrl(m.videoPoster);
         else video.removeAttribute('poster');
+        if (video.readyState >= 1) showLoadedVideo();
     } else if (video) {
         video.pause();
         videoSource?.removeAttribute('src');
         video.removeAttribute('src');
         video.load();
     }
-    if (videoSection) videoSection.style.display = videoVisible ? '' : 'none';
-    if (videoNavLink) (videoNavLink.closest('li') || videoNavLink).style.display = videoVisible ? '' : 'none';
-    const watchVideoButton = document.getElementById('heroWatchVideoBtn');
-    if (watchVideoButton) watchVideoButton.hidden = !videoVisible;
     if (m.videoTitle) setText('dynVideoTitle', m.videoTitle);
+
+    const storyImage = document.getElementById('dynStoryImg');
+    const storyImageUrl = m.sahyadriImage || m.heroImage;
+    if (storyImage && storyImageUrl) storyImage.src = toPublicAssetUrl(storyImageUrl);
 
     // Love Story
     if (st.tag) setText('dynStoryTag', st.tag);
@@ -470,7 +489,9 @@ function applySectionsVisibility(sections, settings = {}) {
     const availability = {
         showStory: !Array.isArray(settings.story?.steps) || settings.story.steps.length > 0 || Boolean(settings.story?.quote),
         showCeremonies: !Array.isArray(settings.ceremonies) || settings.ceremonies.length > 0,
-        showPhotos: !Array.isArray(galleryItems) || galleryItems.length > 0
+        showPhotos: !Array.isArray(galleryItems) || galleryItems.length > 0,
+        showVideo: Boolean(String(settings.media?.videoUrl || settings.media?.customVideo || '').trim()),
+        showShagun: settings.shagun?.enabled !== false && Boolean(settings.shagun?.upiId && settings.shagun?.payeeName)
     };
 
     Object.keys(mapping).forEach(key => {
@@ -545,8 +566,10 @@ function renderGallery(photos) {
     photos.forEach(p => {
         const item = document.createElement('div');
         item.className = 'gallery-item';
-        item.setAttribute('data-category', p.category || 'all');
-        const photoUrl = escapeHTML(toPublicAssetUrl(p.url || ''));
+        const categoryAliases = { sakharpuda: 'engagement', halad: 'haldi', saptapadi: 'wedding', vivah: 'wedding', sahyadri: 'couple' };
+        const rawCategory = String(p.category || 'all').toLowerCase();
+        item.setAttribute('data-category', categoryAliases[rawCategory] || rawCategory);
+        const photoUrl = escapeHTML(toPublicAssetUrl(p.url || p.src || p.image || ''));
         item.innerHTML = `
             <img src="${photoUrl}" alt="${escapeHTML(p.caption || 'Wedding Photo')}" loading="lazy">
             <div class="gallery-overlay">
@@ -562,7 +585,7 @@ function renderGallery(photos) {
    ======================================================== */
 function initCountdown() {
     function update() {
-        const targetISO = currentSettings?.general?.weddingDateTimeISO || '2026-05-05T12:35:00+05:30';
+        const targetISO = currentSettings?.general?.weddingDateTimeISO || '2026-12-17T12:35:00+05:30';
         const target = new Date(targetISO).getTime();
         const now = new Date().getTime();
         const diff = target - now;
@@ -662,6 +685,53 @@ function initRSVP() {
     const statusAlert = document.getElementById('rsvpStatusAlert');
     if (!form) return;
 
+    const activeSite = (typeof window !== 'undefined' && window.ACTIVE_CLIENT_SLUG)
+        || new URLSearchParams(window.location.search).get('client')
+        || new URLSearchParams(window.location.search).get('site')
+        || localStorage.getItem('wedding_active_slug')
+        || 'aaditi-rohan';
+    const wishesList = document.getElementById('guestWishesList');
+
+    const renderGuestWishes = (items) => {
+        if (!wishesList) return;
+        wishesList.replaceChildren();
+        const messages = (Array.isArray(items) ? items : [])
+            .filter(item => typeof item?.message === 'string' && item.message.trim())
+            .slice(0, 12);
+        if (!messages.length) {
+            const empty = document.createElement('p');
+            empty.className = 'guest-wishes-empty';
+            empty.textContent = 'अजून संदेश आलेले नाहीत. तुमचा संदेश पहिला असू शकतो!';
+            wishesList.appendChild(empty);
+            return;
+        }
+        messages.forEach(item => {
+            const card = document.createElement('article');
+            card.className = 'guest-wish-card';
+            const message = document.createElement('p');
+            message.textContent = item.message;
+            card.appendChild(message);
+            wishesList.appendChild(card);
+        });
+    };
+
+    const loadGuestWishes = async () => {
+        try {
+            const response = await fetch(`/api/wishes/public?client=${encodeURIComponent(activeSite)}`);
+            if (response.ok) {
+                renderGuestWishes(await response.json());
+                return;
+            }
+        } catch (error) {}
+        try {
+            renderGuestWishes(JSON.parse(localStorage.getItem('wedding_wishes_' + activeSite) || '[]'));
+        } catch (error) {
+            renderGuestWishes([]);
+        }
+    };
+
+    loadGuestWishes();
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = (document.getElementById('rsvpName') || document.getElementById('guestName'))?.value.trim();
@@ -671,12 +741,6 @@ function initRSVP() {
         const wishes = (document.getElementById('rsvpWishes') || document.getElementById('guestBlessing'))?.value.trim();
 
         const events = Array.from(form.querySelectorAll('input[name="events"]:checked')).map(cb => cb.value);
-
-        const activeSite = (typeof window !== 'undefined' && window.ACTIVE_CLIENT_SLUG)
-            || new URLSearchParams(window.location.search).get('client')
-            || new URLSearchParams(window.location.search).get('site')
-            || localStorage.getItem('wedding_active_slug')
-            || 'aaditi-rohan';
 
         const rsvpData = {
             id: 'rsvp_' + Date.now(),
@@ -709,28 +773,29 @@ function initRSVP() {
                 const existingWishes = JSON.parse(localStorage.getItem('wedding_wishes_' + activeSite) || '[]');
                 existingWishes.unshift(wishItem);
                 localStorage.setItem('wedding_wishes_' + activeSite, JSON.stringify(existingWishes));
-                fetch('/api/wishes', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(wishItem)
-                }).catch(() => {});
             } catch(e) {}
         }
 
         // Attempt server sync
+        let serverSaved = false;
         try {
-            await fetch('/api/rsvp', {
+            const response = await fetch('/api/rsvp', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(rsvpData)
             });
+            serverSaved = response.ok;
         } catch(e) {}
 
+        await loadGuestWishes();
+
         if (statusAlert) {
-            statusAlert.className = 'status-alert success';
-            statusAlert.textContent = '✓ धन्यवाद! आपली उपस्थिती यशस्वीरीत्या नोंदवली गेली आहे.';
+            statusAlert.className = `status-alert ${serverSaved ? 'success' : 'error'}`;
+            statusAlert.textContent = serverSaved
+                ? '✓ धन्यवाद! आपली उपस्थिती आणि संदेश नोंदवला गेला आहे.'
+                : 'संदेश या उपकरणावर जतन झाला, पण सर्व्हरशी संपर्क झाला नाही. कृपया पुन्हा प्रयत्न करा.';
             statusAlert.classList.remove('hidden');
-            setTimeout(() => { statusAlert.classList.add('hidden'); }, 5000);
+            setTimeout(() => { statusAlert.classList.add('hidden'); }, 7000);
         }
 
         form.reset();

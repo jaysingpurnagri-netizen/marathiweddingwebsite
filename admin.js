@@ -880,7 +880,7 @@ async function switchWebsite(id, force = false) {
         try { updateActiveWebsiteBadge(); } catch(e) {}
         try { updateClientStatsCounters(); } catch(e) {}
         try { updateLaunchTexts(); } catch(e) {}
-        try { refreshPreviewIframe(); } catch(e) {}
+        try { refreshPreviewIframe(id); } catch(e) {}
         try { markSaved(); } catch(e) {}
 
         // Crucial: Load client-isolated RSVPs and Wishes for this specific client
@@ -1423,14 +1423,16 @@ async function downloadSingleHtml() {
 /* ========================================================
    4. RESPONSIVE LIVE PREVIEW MODAL
    ======================================================== */
+let responsivePreviewClientId = null;
+
 function openResponsivePreview(targetId) {
-    if (targetId && targetId !== activeWebsiteId) {
-        switchWebsite(targetId, true);
-    }
+    // Preview the selected tenant directly. Switching the editor is asynchronous,
+    // so opening the modal immediately could otherwise load the previous client.
+    responsivePreviewClientId = targetId || activeWebsiteId || 'aaditi-rohan';
     const modal = document.getElementById('responsivePreviewModal');
     if (modal) {
         modal.classList.remove('hidden');
-        refreshPreviewIframe();
+        refreshPreviewIframe(responsivePreviewClientId);
     }
 }
 
@@ -1448,10 +1450,13 @@ function setPreviewDevice(device) {
     });
 }
 
-function refreshPreviewIframe() {
+function refreshPreviewIframe(clientId) {
     const ifr = document.getElementById('responsivePreviewIframe');
     if (ifr) {
-        ifr.src = `index.html?site=${encodeURIComponent(activeWebsiteId)}&preview=${Date.now()}`;
+        responsivePreviewClientId = clientId || responsivePreviewClientId || activeWebsiteId || 'aaditi-rohan';
+        // /c/:slug injects that client's saved settings before the shared page
+        // starts, keeping every client preview independent of the admin selection.
+        ifr.src = `/c/${encodeURIComponent(responsivePreviewClientId)}?preview=${Date.now()}`;
     }
 }
 
@@ -1689,7 +1694,7 @@ function renderPhotos() {
         card.innerHTML = `
             <div class="photo-title">${escapeHTML(p.title || 'छायाचित्र')}</div>
             <div class="photo-preview-wrap">
-                <img src="${escapeHTML(p.src || 'assets/images/hero_couple.jpg')}" alt="${escapeHTML(p.title || '')}" onerror="this.src='assets/images/hero_couple.jpg'">
+                <img src="${escapeHTML(p.src || p.url || 'assets/images/hero_couple.jpg')}" alt="${escapeHTML(p.title || p.caption || '')}" onerror="this.src='assets/images/hero_couple.jpg'">
             </div>
             <p style="font-size:0.8rem; color:#666; margin:8px 0;">${escapeHTML(p.caption || '')}</p>
             <button type="button" class="btn btn-danger-sm" style="width:100%; justify-content:center;" onclick="deleteGalleryPhoto('${p.id}')">
@@ -1851,7 +1856,7 @@ async function initRsvpManager(targetSlug) {
     const slug = targetSlug || activeWebsiteId || 'aaditi-rohan';
     let rsvps = [];
     try {
-        const res = await fetch(`/api/rsvp?client=${encodeURIComponent(slug)}`);
+        const res = await fetch(`/api/rsvp?client=${encodeURIComponent(slug)}`, { headers: getAuthHeaders() });
         if (res.ok) rsvps = await res.json();
     } catch (e) {}
 
@@ -2112,7 +2117,7 @@ async function initWishesManager(targetSlug) {
 
     let wishes = [];
     try {
-        const res = await fetch(`/api/wishes?client=${encodeURIComponent(slug)}`);
+        const res = await fetch(`/api/wishes?client=${encodeURIComponent(slug)}`, { headers: getAuthHeaders() });
         if (res.ok) wishes = await res.json();
     } catch (e) {}
 
@@ -2401,11 +2406,21 @@ function populateForm(s) {
 
     // Media (Audio & Video)
     const med = s.media || {};
-    setVal('bgMusicUrl', med.backgroundAudio || med.bgMusicUrl || 'assets/audio/marathi_wedding_shehnai.mp3');
+    setVal('bgMusicUrl', med.backgroundAudio || med.bgMusicUrl || med.customAudio || '');
     setVal('videoUrlInput', med.videoUrl || (med.useGhibliVideo === true ? (med.defaultVideo || 'assets/video/ghibli_wedding_journey.mp4') : ''));
     setVal('videoPosterInput', med.videoPoster || 'assets/images/hero_couple.jpg');
     setVal('videoTitleInput', med.videoTitle || '');
     setCheck('useGhibliVideoToggle', med.useGhibliVideo === true);
+    [
+        ['previewHeroImg', med.heroImage, 'assets/images/hero_couple.jpg'],
+        ['previewSakharpudaImg', med.sakharpudaImage, 'assets/images/sakharpuda.jpg'],
+        ['previewHaladImg', med.haladImage, 'assets/images/halad.jpg'],
+        ['previewSaptapadiImg', med.saptapadiImage, 'assets/images/saptapadi.jpg'],
+        ['previewSahyadriImg', med.sahyadriImage, 'assets/images/sahyadri_romance.jpg']
+    ].forEach(([id, src, fallback]) => {
+        const image = document.getElementById(id);
+        if (image) image.src = src || fallback;
+    });
 
     // Section Visibility
     const sec = s.sections || {};
@@ -2504,7 +2519,7 @@ function collectFormData() {
     const videoUrlInput = document.getElementById('videoUrlInput');
     if (audioUrlInput) weddingSettings.media.backgroundAudio = audioUrlInput.value.trim();
     else if (!Object.prototype.hasOwnProperty.call(weddingSettings.media, 'backgroundAudio')) {
-        weddingSettings.media.backgroundAudio = weddingSettings.media.bgMusicUrl || 'assets/audio/marathi_wedding_shehnai.mp3';
+        weddingSettings.media.backgroundAudio = weddingSettings.media.bgMusicUrl || '';
     }
     weddingSettings.media.bgMusicUrl = weddingSettings.media.backgroundAudio;
     if (videoUrlInput) weddingSettings.media.videoUrl = videoUrlInput.value.trim();
@@ -2517,8 +2532,9 @@ function collectFormData() {
     if (videoTitleInput) weddingSettings.media.videoTitle = videoTitleInput.value.trim();
 
     weddingSettings.shagun = {
-        upiId: getVal('cfgUpiId') || 'aaditi.rohan@okaxis',
-        payeeName: getVal('cfgPayeeName') || 'Aaditi & Rohan Vivah',
+        upiId: getVal('cfgUpiId'),
+        payeeName: getVal('cfgPayeeName'),
+        enabled: Boolean(getVal('cfgUpiId') && getVal('cfgPayeeName')),
         note: getVal('cfgShagunNote') || 'सस्नेह शुभाशीर्वाद व डिजिटल आहेर',
         amounts: [
             parseInt(getVal('cfgAmt1'), 10) || 501,
@@ -2648,6 +2664,65 @@ function initMediaUploadControls() {
         preview.load();
     };
 
+    const photoControls = [
+        { inputId: 'uploadHeroInput', previewId: 'previewHeroImg', mediaKey: 'heroImage', galleryId: 'gal_1', galleryIndex: 0, category: 'couple', fallback: 'assets/images/hero_couple.jpg' },
+        { inputId: 'uploadSakharpudaInput', previewId: 'previewSakharpudaImg', mediaKey: 'sakharpudaImage', galleryId: 'gal_2', galleryIndex: 1, category: 'engagement', fallback: 'assets/images/sakharpuda.jpg' },
+        { inputId: 'uploadHaladInput', previewId: 'previewHaladImg', mediaKey: 'haladImage', galleryId: 'gal_3', galleryIndex: 2, category: 'haldi', fallback: 'assets/images/halad.jpg' },
+        { inputId: 'uploadSaptapadiInput', previewId: 'previewSaptapadiImg', mediaKey: 'saptapadiImage', galleryId: 'gal_4', galleryIndex: 3, category: 'wedding', fallback: 'assets/images/saptapadi.jpg' },
+        { inputId: 'uploadSahyadriInput', previewId: 'previewSahyadriImg', mediaKey: 'sahyadriImage', galleryId: 'gal_5', galleryIndex: 4, category: 'couple', fallback: 'assets/images/sahyadri_romance.jpg' }
+    ];
+
+    photoControls.forEach(control => {
+        const input = document.getElementById(control.inputId);
+        input?.addEventListener('change', async () => {
+            const file = input.files?.[0];
+            input.value = '';
+            if (!file) return;
+            const extension = (file.name.split('.').pop() || '').toLowerCase();
+            if (!file.type.startsWith('image/') || !['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(extension)) {
+                showToast('कृपया JPG, PNG, WebP किंवा GIF फोटो निवडा.');
+                return;
+            }
+            if (file.size > 15 * 1024 * 1024) {
+                showToast('फोटोचा आकार १५ MB पेक्षा कमी ठेवा.');
+                return;
+            }
+
+            try {
+                const client = encodeURIComponent((activeWebsiteId || 'aaditi-rohan').replace(/[^a-z0-9_-]/gi, '_'));
+                const response = await fetch(`/api/upload?client=${client}`, {
+                    method: 'POST',
+                    headers: getAuthHeaders({ 'X-Filename': encodeURIComponent(file.name) }),
+                    body: file
+                });
+                const result = await response.json();
+                if (!response.ok || !result.success || !result.url) {
+                    throw new Error(result.error || 'फोटो अपलोड झाला नाही.');
+                }
+
+                weddingSettings = weddingSettings || {};
+                weddingSettings.media = weddingSettings.media || {};
+                weddingSettings.media[control.mediaKey] = result.url;
+                weddingSettings.gallery = Array.isArray(weddingSettings.gallery) ? weddingSettings.gallery : [];
+                const photo = weddingSettings.gallery.find(item => item.id === control.galleryId) || weddingSettings.gallery[control.galleryIndex];
+                if (photo) {
+                    photo.src = result.url;
+                    photo.url = result.url;
+                } else {
+                    weddingSettings.gallery.push({ id: control.galleryId, title: control.mediaKey, caption: '', category: control.category, src: result.url });
+                }
+                const preview = document.getElementById(control.previewId);
+                if (preview) preview.src = result.url;
+                renderPhotos();
+                markDirty();
+                await saveSettings();
+                showToast('✓ फोटो अपलोड करून गॅलरीमध्ये सेव्ह केला!');
+            } catch (error) {
+                showToast('फोटो अपलोड अयशस्वी: ' + (error.message || error));
+            }
+        });
+    });
+
     const saveMediaUrl = async (control, url) => {
         if (!weddingSettings) weddingSettings = {};
         weddingSettings.media = weddingSettings.media || {};
@@ -2655,6 +2730,9 @@ function initMediaUploadControls() {
             weddingSettings.media.videoUrl = url;
             weddingSettings.media.customVideo = url;
             weddingSettings.media.useGhibliVideo = url === 'assets/video/ghibli_wedding_journey.mp4';
+            weddingSettings.sections = weddingSettings.sections || {};
+            weddingSettings.sections.showVideo = Boolean(url);
+            setCheck('secShowVideo', Boolean(url));
         } else {
             weddingSettings.media.backgroundAudio = url;
             weddingSettings.media.bgMusicUrl = url;
@@ -2684,6 +2762,8 @@ function initMediaUploadControls() {
         const client = encodeURIComponent((activeWebsiteId || 'aaditi-rohan').replace(/[^a-z0-9_-]/gi, '_'));
         const request = new XMLHttpRequest();
         request.open('POST', `/api/upload?client=${client}`);
+        const adminToken = getAdminToken();
+        if (adminToken) request.setRequestHeader('X-Admin-Token', adminToken);
         request.setRequestHeader('X-Filename', encodeURIComponent(file.name));
         request.upload.addEventListener('progress', event => {
             if (event.lengthComputable && fill) fill.style.width = `${Math.round(event.loaded / event.total * 100)}%`;
@@ -2727,6 +2807,9 @@ function initMediaUploadControls() {
                 weddingSettings.media.videoUrl = '';
                 weddingSettings.media.customVideo = '';
                 weddingSettings.media.useGhibliVideo = false;
+                weddingSettings.sections = weddingSettings.sections || {};
+                weddingSettings.sections.showVideo = false;
+                setCheck('secShowVideo', false);
                 const videoUrlInput = document.getElementById('videoUrlInput');
                 if (videoUrlInput) videoUrlInput.value = '';
                 const fallbackToggle = document.getElementById('useGhibliVideoToggle');
@@ -2735,6 +2818,8 @@ function initMediaUploadControls() {
                 weddingSettings.media.backgroundAudio = '';
                 weddingSettings.media.bgMusicUrl = '';
                 weddingSettings.media.customAudio = '';
+                const audioUrlInput = document.getElementById('bgMusicUrl');
+                if (audioUrlInput) audioUrlInput.value = '';
                 document.querySelectorAll('.audio-preset-card').forEach(card => card.classList.remove('active'));
             }
             updatePreview(control, '');
@@ -2756,6 +2841,9 @@ function initMediaUploadControls() {
         weddingSettings.media.videoUrl = url;
         weddingSettings.media.customVideo = url;
         weddingSettings.media.useGhibliVideo = Boolean(url);
+        weddingSettings.sections = weddingSettings.sections || {};
+        weddingSettings.sections.showVideo = Boolean(url);
+        setCheck('secShowVideo', Boolean(url));
         updatePreview(controls[0], url);
         markDirty();
         await saveSettings();
@@ -3138,18 +3226,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const btnResetPhotos = document.getElementById('resetPhotosToGhibliBtn');
     if (btnResetPhotos) {
-        btnResetPhotos.addEventListener('click', () => {
+        btnResetPhotos.addEventListener('click', async () => {
             if (confirm('सर्व फोटो मूळ राजेशाही व घिबली फोटोंवर रीसेट करायचे का?')) {
                 if (weddingSettings) {
-                    weddingSettings.photos = [
-                        { url: 'assets/images/hero_couple.jpg', caption: 'नवदांपत्य - आदिती आणि रोहन', category: 'couple' },
-                        { url: 'assets/images/sakharpuda.jpg', caption: 'मंगल साखरपुडा सोहळा', category: 'engagement' },
-                        { url: 'assets/images/halad.jpg', caption: 'सोनियाची हळद', category: 'haldi' },
-                        { url: 'assets/images/saptapadi.jpg', caption: 'अग्नी साक्षीने पवित्र सप्तपदी', category: 'wedding' },
-                        { url: 'assets/images/sahyadri_romance.jpg', caption: 'निसर्गाच्या कुशीतील गोड क्षण', category: 'couple' }
+                    const defaults = [
+                        { id: 'gal_1', title: 'मुख्य जोडी', caption: 'नवदांपत्य', category: 'couple', src: 'assets/images/hero_couple.jpg' },
+                        { id: 'gal_2', title: 'साखरपुडा', caption: 'मंगल साखरपुडा सोहळा', category: 'engagement', src: 'assets/images/sakharpuda.jpg' },
+                        { id: 'gal_3', title: 'हळदीचा रंग', caption: 'सोनियाची हळद', category: 'haldi', src: 'assets/images/halad.jpg' },
+                        { id: 'gal_4', title: 'सप्तपदी', caption: 'अग्नी साक्षीने पवित्र सप्तपदी', category: 'wedding', src: 'assets/images/saptapadi.jpg' },
+                        { id: 'gal_5', title: 'सह्याद्री सफर', caption: 'निसर्गाच्या कुशीतील गोड क्षण', category: 'couple', src: 'assets/images/sahyadri_romance.jpg' }
                     ];
+                    weddingSettings.gallery = defaults;
+                    weddingSettings.media = weddingSettings.media || {};
+                    ['heroImage', 'sakharpudaImage', 'haladImage', 'saptapadiImage', 'sahyadriImage'].forEach((key, index) => {
+                        weddingSettings.media[key] = defaults[index].src;
+                    });
+                    ['previewHeroImg', 'previewSakharpudaImg', 'previewHaladImg', 'previewSaptapadiImg', 'previewSahyadriImg'].forEach((id, index) => {
+                        const image = document.getElementById(id);
+                        if (image) image.src = defaults[index].src;
+                    });
                     renderPhotos();
                     markDirty();
+                    await saveSettings();
                     showToast('✓ फोटो मूळ गॅलरीवर रीसेट केले!');
                 }
             }

@@ -246,6 +246,12 @@ function isAdminAuthenticated(req) {
   return true;
 }
 
+function requireAdmin(req, res) {
+  if (isAdminAuthenticated(req)) return true;
+  sendJSON(res, 401, { error: 'Admin sign-in required' });
+  return false;
+}
+
 function createAdminSession() {
   const token = 'adm_' + crypto.randomBytes(24).toString('hex');
   const expiresAt = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
@@ -529,6 +535,7 @@ const server = http.createServer((req, res) => {
 
   // 1.2 POST /api/clients/create or POST /api/websites/create - Create new client
   if ((pathname === '/api/clients/create' || pathname === '/api/websites/create') && req.method === 'POST') {
+    if (!requireAdmin(req, res)) return;
     readJSON((err, payload) => {
       if (err) return sendJSON(res, 400, { error: 'Invalid JSON payload' });
       try {
@@ -616,6 +623,7 @@ const server = http.createServer((req, res) => {
 
   // 1.3 POST /api/clients/switch or POST /api/websites/switch - Switch active client in admin
   if ((pathname === '/api/clients/switch' || pathname === '/api/websites/switch') && req.method === 'POST') {
+    if (!requireAdmin(req, res)) return;
     readJSON((err, payload) => {
       const targetSlug = (payload.slug || payload.id || '').toLowerCase().replace(/[^a-z0-9_-]/g, '-');
       if (!targetSlug) return sendJSON(res, 400, { error: 'Missing client slug' });
@@ -644,6 +652,7 @@ const server = http.createServer((req, res) => {
 
   // 1.4 POST /api/clients/status - Update publishing status (published / draft / archived)
   if (pathname === '/api/clients/status' && req.method === 'POST') {
+    if (!requireAdmin(req, res)) return;
     readJSON((err, payload) => {
       const slug = (payload.slug || payload.id || '').toLowerCase().replace(/[^a-z0-9_-]/g, '-');
       const newStatus = payload.status; // 'published' | 'draft' | 'archived'
@@ -669,6 +678,7 @@ const server = http.createServer((req, res) => {
   // 1.5 DELETE /api/clients/:slug or DELETE /api/websites/:slug - Delete client with safeguards
   const deleteClientMatch = pathname.match(/^\/api\/(clients|websites)\/([^/]+)$/);
   if (deleteClientMatch && req.method === 'DELETE') {
+    if (!requireAdmin(req, res)) return;
     const targetSlug = decodeURIComponent(deleteClientMatch[2]);
     const index = getClientIndex();
 
@@ -723,6 +733,7 @@ const server = http.createServer((req, res) => {
 
   // 2.2 POST /api/settings - Save settings isolated to target client
   if (pathname === '/api/settings' && req.method === 'POST') {
+    if (!requireAdmin(req, res)) return;
     readJSON((err, updatedSettings) => {
       if (err) return sendJSON(res, 400, { error: 'Invalid JSON body' });
       try {
@@ -764,6 +775,7 @@ const server = http.createServer((req, res) => {
 
     // GET /api/rsvp?client=<slug>
     if (req.method === 'GET') {
+      if (!requireAdmin(req, res)) return;
       const rsvps = getClientRsvps(clientSlug);
       sendJSON(res, 200, rsvps);
       return;
@@ -794,7 +806,7 @@ const server = http.createServer((req, res) => {
           wishList.unshift({
             id: 'wish_' + Date.now(),
             name: newRsvp.name,
-            message: payload.wishes,
+            message: String(payload.wishes).slice(0, 600),
             city: 'पुणे',
             timestamp: 'आत्ताच'
           });
@@ -809,6 +821,7 @@ const server = http.createServer((req, res) => {
 
   // DELETE /api/rsvp/:id?client=<slug>
   if (pathname.startsWith('/api/rsvp/') && req.method === 'DELETE' && !pathname.endsWith('/clear-all')) {
+    if (!requireAdmin(req, res)) return;
     const idToDelete = pathname.replace('/api/rsvp/', '');
     const clientSlug = query.get('client') || query.get('site') || getClientIndex().activeId || 'aaditi-rohan';
     let list = getClientRsvps(clientSlug);
@@ -820,6 +833,7 @@ const server = http.createServer((req, res) => {
 
   // POST /api/rsvp/clear-all?client=<slug>
   if (pathname === '/api/rsvp/clear-all' && req.method === 'POST') {
+    if (!requireAdmin(req, res)) return;
     const clientSlug = query.get('client') || query.get('site') || getClientIndex().activeId || 'aaditi-rohan';
     saveClientRsvps(clientSlug, []);
     sendJSON(res, 200, { success: true, message: `All RSVPs cleared for ${clientSlug}`, count: 0 });
@@ -828,6 +842,7 @@ const server = http.createServer((req, res) => {
 
   // GET /api/rsvp/export-csv?client=<slug>
   if (pathname === '/api/rsvp/export-csv' && req.method === 'GET') {
+    if (!requireAdmin(req, res)) return;
     const clientSlug = query.get('client') || query.get('site') || getClientIndex().activeId || 'aaditi-rohan';
     const rsvps = getClientRsvps(clientSlug);
     let csv = '\uFEFF';
@@ -858,11 +873,30 @@ const server = http.createServer((req, res) => {
   // 4. ISOLATED WISHES WALL APIS
   // -----------------------------------------------------------
 
+  // Public invitation view exposes only guest message text, never RSVP details.
+  if (pathname === '/api/wishes/public' && req.method === 'GET') {
+    const clientSlug = query.get('client') || query.get('site') || getClientIndex().activeId || 'aaditi-rohan';
+    const seenMessages = new Set();
+    const publicMessages = getClientWishes(clientSlug)
+      .filter(wish => typeof wish.message === 'string' && wish.message.trim())
+      .filter(wish => {
+        const key = `${wish.message.trim()}|${wish.timestamp || ''}`;
+        if (seenMessages.has(key)) return false;
+        seenMessages.add(key);
+        return true;
+      })
+      .slice(0, 30)
+      .map(wish => ({ message: wish.message.slice(0, 600), timestamp: wish.timestamp || '' }));
+    sendJSON(res, 200, publicMessages);
+    return;
+  }
+
   if (pathname === '/api/wishes') {
     const clientSlug = query.get('client') || query.get('site') || getClientIndex().activeId || 'aaditi-rohan';
 
     // GET /api/wishes?client=<slug>
     if (req.method === 'GET') {
+      if (!requireAdmin(req, res)) return;
       const wishes = getClientWishes(clientSlug);
       sendJSON(res, 200, wishes);
       return;
@@ -891,6 +925,7 @@ const server = http.createServer((req, res) => {
 
   // DELETE /api/wishes/:id?client=<slug>
   if (pathname.startsWith('/api/wishes/') && req.method === 'DELETE' && !pathname.endsWith('/clear-all')) {
+    if (!requireAdmin(req, res)) return;
     const idToDelete = pathname.replace('/api/wishes/', '');
     const clientSlug = query.get('client') || query.get('site') || getClientIndex().activeId || 'aaditi-rohan';
     let list = getClientWishes(clientSlug);
@@ -902,6 +937,7 @@ const server = http.createServer((req, res) => {
 
   // POST /api/wishes/clear-all?client=<slug>
   if (pathname === '/api/wishes/clear-all' && req.method === 'POST') {
+    if (!requireAdmin(req, res)) return;
     const clientSlug = query.get('client') || query.get('site') || getClientIndex().activeId || 'aaditi-rohan';
     saveClientWishes(clientSlug, []);
     sendJSON(res, 200, { success: true, message: `All wishes cleared for ${clientSlug}`, count: 0 });
@@ -912,6 +948,7 @@ const server = http.createServer((req, res) => {
   // 5. ISOLATED MEDIA UPLOADS
   // -----------------------------------------------------------
   if (pathname === '/api/upload' && req.method === 'POST') {
+    if (!requireAdmin(req, res)) return;
     const clientSlug = query.get('client') || query.get('site') || getClientIndex().activeId || 'aaditi-rohan';
     const targetDir = path.join(UPLOADS_DIR, clientSlug);
     if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });

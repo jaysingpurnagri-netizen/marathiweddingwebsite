@@ -254,7 +254,7 @@
                     <li><a href="#hero" class="nav-link active">होम</a></li>
                     <li><a href="#story" class="nav-link">प्रेमकथा</a></li>
                     <li><a href="#ceremonies" class="nav-link">सोहळा व मुहूर्त</a></li>
-                    <li><a href="#video" class="nav-link">चलचित्र</a></li>
+                    <li id="videoNavItem" hidden><a href="#video" class="nav-link">चलचित्र</a></li>
                     <li><a href="#saptapadi" class="nav-link">सप्तपदी</a></li>
                     <li><a href="#gallery" class="nav-link">फोटो गॅलरी</a></li>
                     <li><a href="#dresscode" class="nav-link">पोशाख</a></li>
@@ -384,7 +384,7 @@
                 <button id="heroOpenScrollBtn" class="btn btn-primary">
                     <i class="fa-solid fa-scroll"></i> शाही पत्रिका उघडा
                 </button>
-                <a href="#video" class="btn btn-accent" id="heroWatchVideoBtn">
+                <a href="#video" class="btn btn-accent" id="heroWatchVideoBtn" hidden>
                     <i class="fa-solid fa-circle-play"></i> विवाह व्हिडिओ पहा
                 </a>
                 <button id="btnAddToCalendar" class="btn btn-secondary">
@@ -453,7 +453,7 @@
     </section>
 
     <!-- Video Showcase Section -->
-    <section class="video-section section-padding" id="video">
+    <section class="video-section section-padding" id="video" hidden>
         <div class="container">
             <div class="section-header">
                 <span class="section-tag">चलचित्र व पूर्वझलक</span>
@@ -660,7 +660,7 @@
 
                     <div class="form-group">
                         <label id="rsvpWishesLabel" for="rsvpWishes"><i class="fa-solid fa-heart"></i> नवदांपत्यासाठी संदेश किंवा शुभेच्छा</label>
-                        <textarea id="rsvpWishes" name="wishes" rows="3" placeholder="आपल्या शुभेच्छा येथे लिहा..."></textarea>
+                        <textarea id="rsvpWishes" name="wishes" rows="3" maxlength="600" placeholder="आपल्या शुभेच्छा येथे लिहा..."></textarea>
                     </div>
 
                     <div class="form-actions">
@@ -671,6 +671,18 @@
 
                     <div id="rsvpStatusAlert" class="status-alert hidden"></div>
                 </form>
+                <section class="guest-wishes-wall" id="guestWishesWall" aria-live="polite">
+                    <div class="guest-wishes-heading">
+                        <span>💌</span>
+                        <div>
+                            <h3>पाहुण्यांचे शुभ संदेश</h3>
+                            <p>नवदांपत्यासाठी आलेल्या प्रेमळ शुभेच्छा</p>
+                        </div>
+                    </div>
+                    <div class="guest-wishes-list" id="guestWishesList">
+                        <p class="guest-wishes-empty">अजून संदेश आलेले नाहीत. तुमचा संदेश पहिला असू शकतो!</p>
+                    </div>
+                </section>
             </div>
         </div>
     </section>

@@ -3,7 +3,7 @@
   "sections": {
     "showStory": true,
     "showCeremonies": true,
-    "showVideo": true,
+    "showVideo": false,
     "showPhotos": true,
     "showUkhane": true,
     "showScroll": true,
@@ -12,7 +12,7 @@
     "showHosts": true,
     "showCountdown": true,
     "showPetals": true,
-    "showShagun": true,
+    "showShagun": false,
     "showAarti": true,
     "showDressCode": true,
     "showWishes": true,
@@ -61,12 +61,15 @@
     "saptapadiImage": "assets/images/saptapadi.jpg",
     "sahyadriImage": "assets/images/sahyadri_romance.jpg",
     "customVideo": "",
-    "useGhibliVideo": true,
+    "useGhibliVideo": false,
     "defaultVideo": "assets/video/ghibli_wedding_journey.mp4",
     "customAudio": "assets/audio/wedding_song.mp3",
     "audioTitle": "मिलन अभी आधा अधूरा है (विवाह)",
     "audioRaga": "रोमँटिक विवाह गीत • उदित नारायण व श्रेया घोषाल",
-    "defaultAudio": "assets/audio/wedding_song.mp3"
+    "defaultAudio": "assets/audio/wedding_song.mp3",
+    "backgroundAudio": "assets/audio/wedding_song.mp3",
+    "bgMusicUrl": "assets/audio/wedding_song.mp3",
+    "videoUrl": ""
   },
   "story": {
     "quote": "सह्याद्रीच्या हिरव्यागार कुशीत, ट्रेकच्या वाटेवर भेटलेले दोन अनोळखी जीव... हळूहळू विचारांची तार जुळली, सुख-दुःखात सोबत लाभली आणि मैत्रीचे रूपांतर एका सुंदर, पवित्र जीवन प्रवासात झाले!",
@@ -134,12 +137,12 @@
   "ukhane": {
     "brideUkhanaLine1": "चांदीच्या ताटात खडीसाखरेची वाटी,",
     "brideUkhanaLine2": "सप्तपदीच्या फेऱ्यात बांधल्या रेशीमगाठी...",
-    "brideUkhanaLine3": "आदित्यरावांचे नाव घेते भोरेंच्या घरी,",
+    "brideUkhanaLine3": "रोहनरावांचे नाव घेते भोरेंच्या घरी,",
     "brideUkhanaLine4": "आता लक्ष्मी होऊन नांदेन वाकोडेंच्या दारी!",
     "groomUkhanaLine1": "सह्याद्रीच्या कड्यावरून वाहतो थंड गार वारा,",
-    "groomUkhanaLine2": "साधनाच्या हातात हात शोभतो साऱ्या संसारा...",
+    "groomUkhanaLine2": "आदितीच्या हातात हात शोभतो साऱ्या संसारा...",
     "groomUkhanaLine3": "माझ्या आई-बाबांच्या लाडक्या घरात,",
-    "groomUkhanaLine4": "साधनाचे नाव घेतो वाकोडेंच्या कुळात!"
+    "groomUkhanaLine4": "आदितीचे नाव घेतो वाकोडेंच्या कुळात!"
   },
   "royalScroll": {
     "sealText": "॥ श्री गणेशाय नमः ॥",
@@ -214,9 +217,9 @@
   ],
   "openingStyle": "envelope-wax",
   "shagun": {
-    "enabled": true,
-    "upiId": "aditya.sadhana@okaxis",
-    "payeeName": "Aditya & Sadhana Vivah",
+    "enabled": false,
+    "upiId": "",
+    "payeeName": "",
     "note": "सस्नेह शुभाशीर्वाद व मंगल शगुन (Digital Shagun Blessings)",
     "amounts": [
       501,
