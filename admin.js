@@ -717,8 +717,9 @@ function renderWebsitesGrid() {
     allWebsites.forEach(w => {
         const isActive = w.id === activeWebsiteId;
         const isPublished = (w.status || 'published') === 'published';
-        const siteUrl = (w.id === 'aaditi-rohan') ? 'index.html' : `c/${encodeURIComponent(w.id)}`;
-        const fallbackUrl = (w.id === 'aaditi-rohan') ? 'index.html' : `index.html?client=${encodeURIComponent(w.id)}`;
+        // Always open the tenant route so the server injects this client's
+        // saved settings into the shared invitation template.
+        const siteUrl = `/c/${encodeURIComponent(w.slug || w.id)}`;
         const card = document.createElement('div');
         card.className = 'website-project-card ' + (isActive ? 'active-project' : '');
         card.innerHTML = `
@@ -748,7 +749,7 @@ function renderWebsitesGrid() {
                     <i class="fa-solid fa-toggle-${isPublished ? 'on' : 'off'}" style="color:${isPublished ? '#10B981' : '#F59E0B'};"></i> ${isPublished ? 'मसुदा करा' : 'प्रकाशित करा'}
                 </button>
                 <button type="button" class="btn btn-outline" title="प्रिव्ह्यू पहा" onclick="openResponsivePreview('${escapeHTML(w.id)}')"><i class="fa-solid fa-eye"></i></button>
-                <a href="${fallbackUrl}" target="_blank" class="btn btn-outline" title="नवीन टॅबमध्ये उघडा"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                <a href="${siteUrl}" target="_blank" class="btn btn-outline" title="नवीन टॅबमध्ये उघडा"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
                 ${(w.id !== 'aaditi-rohan' && !w.isDefault) ? '<button type="button" class="btn btn-danger-sm" title="क्लायंट हटवा" onclick="deleteSpecificWebsite(\'' + escapeHTML(w.id) + '\')"><i class="fa-solid fa-trash-can"></i></button>' : ''}
             </div>
         `;
