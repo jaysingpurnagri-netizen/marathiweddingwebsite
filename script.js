@@ -492,6 +492,9 @@ function applySectionsVisibility(sections, settings = {}) {
     const showScroll = sections.showScroll !== false;
     if (scrollButton) scrollButton.hidden = !showScroll;
     if (!showScroll) document.getElementById('scrollSection')?.classList.add('hidden');
+
+    const floatingRsvpButton = document.getElementById('floatingRsvpBtn');
+    if (floatingRsvpButton) floatingRsvpButton.hidden = sections.showRsvp === false;
 }
 
 function renderStoryTimeline(steps) {

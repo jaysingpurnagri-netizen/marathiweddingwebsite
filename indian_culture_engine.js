@@ -198,12 +198,13 @@
 
     function initOpeningStyles() {
         // Read active opening style from settings or localStorage
-        const storedStyle = localStorage.getItem('weddingOpeningStyle');
         const preloaded = window.PRELOADED_WEDDING_SETTINGS || {};
         const defaultStyle = (window.currentSettings && window.currentSettings.openingStyle)
             ? window.currentSettings.openingStyle
             : (preloaded.openingStyle || 'envelope-wax');
-        currentOpenStyle = storedStyle || defaultStyle;
+        // The admin-selected style is authoritative; guest browser storage must
+        // not override the opening experience configured for this invitation.
+        currentOpenStyle = STYLES.includes(defaultStyle) ? defaultStyle : 'envelope-wax';
 
         // Activate matching style in dock
         switchOpenStyleStage(currentOpenStyle);
@@ -826,10 +827,7 @@
     // -------------------------------------------------------------
     window.IndianCultureEngine = {
         init: async function() {
-            await loadThemesList();
             initOpeningStyles();
-            initThemesModal();
-            initFloatingSwitcherDock();
             if (window.currentSettings) {
                 this.update(window.currentSettings);
             }

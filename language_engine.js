@@ -110,6 +110,25 @@
         if (musicBtnText && t.headerActions.musicText) {
             musicBtnText.textContent = t.headerActions.musicText;
         }
+        const floatingRsvpText = document.querySelector('#floatingRsvpBtn span');
+        if (floatingRsvpText && t.rsvp.quickAction) {
+            floatingRsvpText.textContent = t.rsvp.quickAction;
+        }
+
+        const rsvpAttendanceLabel = document.getElementById('rsvpAttendanceLabel');
+        if (rsvpAttendanceLabel && t.rsvp.attendanceQuestion) {
+            rsvpAttendanceLabel.innerHTML = `<i class="fa-solid fa-calendar-check"></i> ${t.rsvp.attendanceQuestion}`;
+        }
+        const rsvpYesOption = document.getElementById('rsvpAttendingYes');
+        if (rsvpYesOption && t.rsvp.attendingYes) rsvpYesOption.textContent = t.rsvp.attendingYes;
+        const rsvpNoOption = document.getElementById('rsvpAttendingNo');
+        if (rsvpNoOption && t.rsvp.attendingNo) rsvpNoOption.textContent = t.rsvp.attendingNo;
+        const rsvpWishesLabel = document.getElementById('rsvpWishesLabel');
+        if (rsvpWishesLabel && t.rsvp.wishesLabel) {
+            rsvpWishesLabel.innerHTML = `<i class="fa-solid fa-heart"></i> ${t.rsvp.wishesLabel}`;
+        }
+        const rsvpWishesInput = document.getElementById('rsvpWishes');
+        if (rsvpWishesInput && t.rsvp.wishesPlaceholder) rsvpWishesInput.placeholder = t.rsvp.wishesPlaceholder;
 
         // 4. Entrance Gate / Opening Styles
         const dockTitle = document.querySelector('.dock-title');
