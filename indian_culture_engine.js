@@ -537,7 +537,10 @@
             if (countG) countG.textContent = `${groomVotes} मते`;
             if (countB) countB.textContent = `${brideVotes} मते`;
             if (meterG) meterG.style.width = `${pctG}%`;
-            if (meterB) meterB.style.width = `${pctB}%`;
+            if (meterB) {
+                meterB.style.width = `${pctB}%`;
+                meterB.style.display = 'block';
+            }
             if (pctGEl) pctGEl.textContent = `${pctG}% वरपक्ष`;
             if (pctBEl) pctBEl.textContent = `${pctB}% वधूपक्ष`;
         }

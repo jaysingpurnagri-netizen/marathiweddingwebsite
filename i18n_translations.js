@@ -93,7 +93,16 @@ const I18N_TRANSLATIONS = {
         saptapadi: {
             tag: 'पवित्र अग्नीसाक्षी',
             title: 'सप्तपदी - सात पवित्र वचने (7 Sacred Vows)',
-            desc: 'पवित्र अग्नीभोवती सात फेरे मारून वधू-वर एकमेकांना आयुष्यभरासाठी धर्म, अर्थ, काम आणि मोक्षाची साथ देण्याची सात दिव्य वचने देतात.'
+            desc: 'पवित्र अग्नीभोवती सात फेरे मारून वधू-वर एकमेकांना आयुष्यभरासाठी धर्म, अर्थ, काम आणि मोक्षाची साथ देण्याची सात दिव्य वचने देतात.',
+            vows: [
+                { title: 'अन्न व पोषणाची साथ', desc: 'आपल्या घरात अन्नधान्य, आरोग्य आणि समाधान नांदो यासाठी आम्ही एकमेकांची साथ देऊ.' },
+                { title: 'बल व आरोग्य', desc: 'शारीरिक आणि मानसिक आरोग्य जपू; संकटात धैर्याने एकमेकांच्या पाठीशी उभे राहू.' },
+                { title: 'समृद्धी व प्रामाणिक श्रम', desc: 'प्रामाणिक प्रयत्नांनी संसार उभारू आणि जीवनातील जबाबदाऱ्या समानतेने वाटून घेऊ.' },
+                { title: 'प्रेम व आनंद', desc: 'परस्पर आदर, प्रेम आणि आनंदाने जीवनातील प्रत्येक क्षण एकत्र साजरा करू.' },
+                { title: 'कुटुंब व संगोपन', desc: 'कुटुंबाचा सन्मान करू आणि मुलं व प्रियजनांची काळजी प्रेमाने एकत्र घेऊ.' },
+                { title: 'प्रत्येक ऋतूत सोबत', desc: 'सुख-दुःखात आणि आयुष्याच्या प्रत्येक टप्प्यावर निष्ठेने एकमेकांची साथ निभावू.' },
+                { title: 'मैत्री व विश्वास', desc: 'आयुष्यभर मित्र आणि विश्वासू साथीदार राहून प्रेम व आदराचे नाते जपू.' }
+            ]
         },
         dresscode: {
             tag: 'पोशाख मार्गदर्शिका',
@@ -248,7 +257,16 @@ const I18N_TRANSLATIONS = {
         saptapadi: {
             tag: 'पवित्र अग्निसाक्षी',
             title: 'सप्तपदी - सात पावन वचन (7 Sacred Vows)',
-            desc: 'पवित्र अग्नि के समक्ष सात फेरे लेकर वर-वधु एक दूसरे को आजीवन धर्म, अर्थ, काम और मोक्ष में साथ निभाने के सात पावन वचन देते हैं।'
+            desc: 'पवित्र अग्नि के समक्ष सात फेरे लेकर वर-वधु एक दूसरे को आजीवन धर्म, अर्थ, काम और मोक्ष में साथ निभाने के सात पावन वचन देते हैं।',
+            vows: [
+                { title: 'पोषण और अन्न', desc: 'हम अपने घर में भोजन, स्वास्थ्य और संतोष बनाए रखने के लिए एक-दूसरे का साथ देंगे।' },
+                { title: 'शक्ति और स्वास्थ्य', desc: 'हम तन और मन का स्वास्थ्य संभालेंगे और कठिन समय में साहस से साथ निभाएंगे।' },
+                { title: 'समृद्धि और ईमानदार प्रयास', desc: 'हम ईमानदारी से अपना घर बसाएंगे और जीवन की जिम्मेदारियां मिलकर उठाएंगे।' },
+                { title: 'प्रेम और आनंद', desc: 'हम सम्मान, प्रेम और खुशी के साथ जीवन के हर पल को साझा करेंगे।' },
+                { title: 'परिवार और देखभाल', desc: 'हम परिवार का सम्मान करेंगे और बच्चों व प्रियजनों की देखभाल मिलकर करेंगे।' },
+                { title: 'हर मौसम में साथ', desc: 'सुख-दुख और जीवन के हर पड़ाव पर हम निष्ठा से एक-दूसरे का साथ देंगे।' },
+                { title: 'मित्रता और विश्वास', desc: 'हम जीवनभर मित्र और भरोसेमंद साथी बनकर प्रेम व सम्मान का रिश्ता निभाएंगे।' }
+            ]
         },
         dresscode: {
             tag: 'पहनावा मार्गदर्शिका',
@@ -403,7 +421,16 @@ const I18N_TRANSLATIONS = {
         saptapadi: {
             tag: 'Sacred Fire Nuptials',
             title: 'Saptapadi - The Seven Sacred Vows',
-            desc: 'Walking seven steps around the holy Vedic Agni, the bride and groom take seven eternal vows of nourishment, health, wealth, happiness, family, companionship, and friendship.'
+            desc: 'Walking seven steps around the holy Vedic Agni, the couple make promises of care, partnership, and shared purpose for life.',
+            vows: [
+                { title: 'Nourishment and care', desc: 'We will support one another in building a home with food, health, and contentment.' },
+                { title: 'Strength and wellbeing', desc: 'We will care for our physical and emotional wellbeing and stand together through difficulty.' },
+                { title: 'Prosperity through honest effort', desc: 'We will build our life with honesty and share its responsibilities as partners.' },
+                { title: 'Love and happiness', desc: 'We will share life’s joys with affection, respect, and understanding.' },
+                { title: 'Family and care', desc: 'We will honor our families and care for children and loved ones together.' },
+                { title: 'Together through every season', desc: 'In changing times, good or difficult, we will remain loyal companions.' },
+                { title: 'Friendship and trust', desc: 'We will be lifelong friends and keep a bond grounded in trust and respect.' }
+            ]
         },
         dresscode: {
             tag: 'Wardrobe Guide',

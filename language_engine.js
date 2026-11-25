@@ -196,6 +196,7 @@
         setSectionHeader('ceremonies', t.ceremonies.tag, t.ceremonies.title, t.ceremonies.desc);
         setSectionHeader('gallery', t.gallery.tag, t.gallery.title, t.gallery.desc);
         setSectionHeader('saptapadi', t.saptapadi.tag, t.saptapadi.title, t.saptapadi.desc);
+        renderSaptapadiVows(t.saptapadi.vows);
         setSectionHeader('dresscode', t.dresscode.tag, t.dresscode.title, t.dresscode.desc);
         setSectionHeader('aarti', t.aarti.tag, t.aarti.title, t.aarti.desc);
         setSectionHeader('rsvp', t.rsvp.tag, t.rsvp.title, t.rsvp.desc);
@@ -249,6 +250,36 @@
             const descEl = sec.querySelector('.section-description');
             if (descEl) descEl.textContent = desc;
         }
+    }
+
+    function renderSaptapadiVows(vows) {
+        const grid = document.getElementById('saptapadiGrid');
+        if (!grid || !Array.isArray(vows) || vows.length === 0) return;
+
+        grid.replaceChildren();
+        vows.slice(0, 7).forEach((vow, index) => {
+            const card = document.createElement('article');
+            card.className = 'saptapadi-card';
+
+            const number = document.createElement('span');
+            number.className = 'saptapadi-number';
+            number.textContent = new Intl.NumberFormat(currentLang, {
+                minimumIntegerDigits: 2,
+                useGrouping: false
+            }).format(index + 1);
+
+            const copy = document.createElement('div');
+            const title = document.createElement('h3');
+            title.className = 'saptapadi-vow-title';
+            title.textContent = vow.title || '';
+            const description = document.createElement('p');
+            description.className = 'saptapadi-vow-desc';
+            description.textContent = vow.desc || '';
+
+            copy.append(title, description);
+            card.append(number, copy);
+            grid.appendChild(card);
+        });
     }
 
     // -------------------------------------------------------------

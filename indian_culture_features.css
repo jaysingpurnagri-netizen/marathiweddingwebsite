@@ -608,3 +608,96 @@
         font-size: 0.9rem;
     }
 }
+
+/* Styled Baraat Battle voting card; matches the live HTML class names. */
+.baraat-battle-box {
+    position: relative;
+    max-width: 780px;
+    margin: 34px auto 0;
+    padding: clamp(22px, 4vw, 34px);
+    overflow: hidden;
+    border: 1px solid var(--border-gold);
+    border-radius: 24px;
+    background: linear-gradient(145deg, #fffdf8, #fff6e8 55%, #fffdf9);
+    box-shadow: 0 14px 40px rgba(94, 43, 20, 0.12);
+    text-align: center;
+}
+
+.battle-title {
+    margin: 0 0 8px;
+    color: var(--royal-maroon);
+    font-family: var(--font-heading);
+    font-size: clamp(1.25rem, 3vw, 1.7rem);
+}
+
+.battle-title i { margin-right: 8px; color: var(--paithani-gold-dark); }
+.battle-sub { margin: 0; color: var(--text-muted); }
+
+.battle-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    margin: 20px 0;
+}
+
+.team-btn {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-width: min(285px, 100%);
+    min-height: 54px;
+    padding: 12px 20px;
+    border: 2px solid transparent;
+    border-radius: 999px;
+    color: #fff;
+    font-family: var(--font-marathi-body);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.35;
+    cursor: pointer;
+    box-shadow: 0 7px 18px rgba(44, 34, 30, 0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.team-btn strong {
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.2);
+    font-size: 0.86rem;
+    white-space: nowrap;
+}
+
+.team-btn:hover { transform: translateY(-3px); filter: saturate(1.08); box-shadow: 0 12px 24px rgba(44, 34, 30, 0.22); }
+.team-btn:active { transform: translateY(0); }
+.team-btn:focus-visible { outline: 3px solid var(--paithani-gold); outline-offset: 4px; }
+.team-btn.groom-team { border-color: #93C5FD; background: linear-gradient(135deg, #1D4ED8, #3B82F6); color: #fff; }
+.team-btn.bride-team { border-color: #FBCFE8; background: linear-gradient(135deg, #BE185D, #EC4899); color: #fff; }
+
+.battle-bar-track {
+    display: flex;
+    width: 100%;
+    height: 13px;
+    overflow: hidden;
+    border: 1px solid rgba(128, 0, 32, 0.12);
+    border-radius: 999px;
+    background: #f3e9dc;
+    box-shadow: inset 0 2px 4px rgba(44, 34, 30, 0.12);
+}
+
+.battle-bar-fill {
+    display: block !important;
+    height: 100%;
+    background: linear-gradient(90deg, #2563EB, #60A5FA);
+    transition: width 0.45s ease;
+}
+
+#meterBride.battle-bar-fill { background: linear-gradient(90deg, #EC4899, #F9A8D4) !important; }
+
+@media (max-width: 560px) {
+    .baraat-battle-box { padding: 22px 16px; border-radius: 18px; }
+    .team-btn { min-width: 100%; }
+}
