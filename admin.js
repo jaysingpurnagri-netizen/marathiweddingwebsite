@@ -291,7 +291,7 @@ const INDIAN_CULTURAL_TEMPLATES = [
   }
 ];
 
-// 6 Interactive Opening Styles
+// 9 Interactive Opening Styles
 const OPENING_STYLES = [
     {
         id: 'envelope-wax',

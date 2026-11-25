@@ -194,6 +194,11 @@
     // 2. INVITATION OPENING EXPERIENCES CONTROLLER (9 STYLES)
     // -------------------------------------------------------------
     const STYLES = ['envelope-wax', 'temple-doors', 'royal-scroll', 'silk-curtains', 'book-flip', 'shagun-box', 'grand-diya', 'modern-glass', 'lotus-bloom'];
+    const STYLE_ALIASES = { 'modern-scroll': 'modern-glass', 'diya': 'grand-diya', 'lotus': 'lotus-bloom' };
+    const normalizeOpeningStyle = styleId => {
+        const normalized = STYLE_ALIASES[styleId] || styleId;
+        return STYLES.includes(normalized) ? normalized : 'envelope-wax';
+    };
     let currentOpenStyle = 'envelope-wax';
 
     function initOpeningStyles() {
@@ -204,7 +209,7 @@
             || 'envelope-wax';
         // The admin-selected style is authoritative; guest browser storage must
         // not override the opening experience configured for this invitation.
-        currentOpenStyle = STYLES.includes(defaultStyle) ? defaultStyle : 'envelope-wax';
+        currentOpenStyle = normalizeOpeningStyle(defaultStyle);
 
         // Activate matching style in dock
         switchOpenStyleStage(currentOpenStyle);
@@ -312,6 +317,7 @@
             stageDiya.classList.add('is-lit');
             SoundFX.templeBell();
             SoundFX.flowerTwinkle();
+            showFloatingToast('🪔 मंगल दीप प्रज्वलित झाला! नवदांपत्याला आपले शुभाशीर्वाद लाभले.');
             const rect = btnLightGrandDiya?.getBoundingClientRect();
             if (rect) {
                 for (let i = 0; i < 18; i++) {
@@ -378,16 +384,6 @@
                 dismissEntranceGate();
             });
         });
-        for (let i = 1; i <= 9; i++) {
-            const btn = document.getElementById(`btnEnterCelebration${i}`);
-            if (btn) {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    dismissEntranceGate();
-                });
-            }
-        }
-
         // Direct skip link
         document.querySelectorAll('.btn-gate-skip').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -412,9 +408,7 @@
     }
 
     function switchOpenStyleStage(styleId) {
-        const legacyStyleAliases = { 'modern-scroll': 'modern-glass', 'diya': 'grand-diya', 'lotus': 'lotus-bloom' };
-        styleId = legacyStyleAliases[styleId] || styleId;
-        if (!STYLES.includes(styleId)) styleId = 'envelope-wax';
+        styleId = normalizeOpeningStyle(styleId);
         currentOpenStyle = styleId;
         const stages = {
             'envelope-wax': 'stageEnvelope',
@@ -577,10 +571,10 @@
         const diyaContainer = document.getElementById('diyaContainer');
         const btnLightDiya = document.getElementById('btnLightDiya');
         const diyaCounterText = document.getElementById('diyaCounterText');
-        let diyaCount = parseInt(localStorage.getItem('diyaCount') || '128', 10);
+        let diyaCount = parseInt(localStorage.getItem('diyaCount') || '462', 10);
 
         function lightDiya() {
-            if (diyaContainer) {
+            if (diyaContainer && !diyaContainer.classList.contains('is-lit')) {
                 diyaContainer.classList.add('is-lit');
                 diyaCount++;
                 localStorage.setItem('diyaCount', diyaCount);
@@ -592,8 +586,14 @@
                 showFloatingToast('🪔 मंगल दीप प्रज्वलित झाला! नवदाम्पत्याला आपले शुभाशीर्वाद लाभले.');
             }
         }
-        if (btnLightDiya) btnLightDiya.addEventListener('click', lightDiya);
-        if (diyaContainer) diyaContainer.addEventListener('click', lightDiya);
+        if (diyaContainer && !diyaContainer.dataset.diyaEventsBound) {
+            btnLightDiya?.addEventListener('click', event => {
+                event.stopPropagation();
+                lightDiya();
+            });
+            diyaContainer.addEventListener('click', lightDiya);
+            diyaContainer.dataset.diyaEventsBound = 'true';
+        }
 
         // Baraat Poll
         let groomVotes = parseInt(localStorage.getItem('groomVotes') || '142', 10);
