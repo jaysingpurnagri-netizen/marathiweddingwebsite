@@ -1469,6 +1469,30 @@ input:checked + .slider:before {
     border-color: #00875A;
 }
 
+/* Keep all six entrance choices reachable inside their own scrollable panel. */
+.opening-styles-scroll-hint {
+    margin: 0 0 10px;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+}
+.opening-styles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+    gap: 20px;
+    max-height: min(68vh, 760px);
+    min-height: 340px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 4px 12px 14px 4px;
+    scrollbar-gutter: stable;
+}
+.opening-styles-grid::-webkit-scrollbar { width: 10px; }
+.opening-styles-grid::-webkit-scrollbar-track { background: #F1E9D9; border-radius: 10px; }
+.opening-styles-grid::-webkit-scrollbar-thumb { background: #C29A32; border: 2px solid #F1E9D9; border-radius: 10px; }
+@media (max-width: 600px) {
+    .opening-styles-grid { max-height: 62vh; min-height: 300px; gap: 14px; }
+}
+
 
 /* =========================================================
    COMMAND CENTER & MULTI-WEBSITE EXTENSIONS

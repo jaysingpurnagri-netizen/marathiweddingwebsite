@@ -301,25 +301,25 @@ const OPENING_STYLES = [
         desc: 'शाही लाल मखमली पाकीट ज्यावर सुवर्ण राजमुद्रा (Wax Seal) असते. पाहुण्यांनी स्पर्श करताच राजमुद्रा उलगडते व लग्नपत्रिका बाहेर येते.'
     },
     {
-        id: 'royal-scroll',
-        name: '२. पेशवेकालीन शाही गुंडाळी (Royal Farman Scroll)',
-        icon: '📜',
-        sound: 'शाही ललकारी, सनई व गुंडाळी उलगडण्याचा नाद',
-        desc: 'शिवकालीन व पेशवेकालीन तांबूल रंगाची सुवर्ण किनारी गुंडाळी. दोन्ही बाजूंनी उलगडत जाऊन मध्यभागी संपूर्ण लग्नपत्रिका प्रकट होते.'
-    },
-    {
         id: 'temple-doors',
-        name: '३. मंदिराचे महाद्वार (Temple Carved Doors)',
+        name: '२. पवित्र मंदिर महाद्वार (Temple Doors)',
         icon: '🚪',
         sound: 'मंदिराच्या पितळी घंटा व महाद्वार उघडण्याचा मंजुळ ध्वनी',
         desc: 'नक्षीकाम केलेले लाकडी व पितळी महाद्वार. उघडताच मंदिरातून फुलांची वृष्टी होते व मंगल वाद्यांच्या गजरात पत्रिका सामोरी येते.'
     },
     {
-        id: 'modern-scroll',
-        name: '४. मॉडर्न स्क्रोलिंग वेब (Modern Scrolling Page)',
-        icon: '📱',
-        sound: 'हळुवार पार्श्वसंगीत व पानांची सळसळ',
-        desc: 'थेट गुळगुळीत स्क्रोलिंग वेबसाईट. एका क्लिकवर संगीतासह थेट विवाह तपशील, काऊंटडाऊन व कार्यक्रम पत्रिका समोर येतात.'
+        id: 'royal-scroll',
+        name: '३. पेशवेकालीन शाही गुंडाळी (Royal Farman Scroll)',
+        icon: '📜',
+        sound: 'शाही ललकारी, सनई व गुंडाळी उलगडण्याचा नाद',
+        desc: 'शिवकालीन व पेशवेकालीन तांबूल रंगाची सुवर्ण किनारी गुंडाळी. दोन्ही बाजूंनी उलगडत जाऊन मध्यभागी संपूर्ण लग्नपत्रिका प्रकट होते.'
+    },
+    {
+        id: 'silk-curtains',
+        name: '४. रेशमी मखमली पडदा (Silk Curtains)',
+        icon: '🎭',
+        sound: 'मखमली रेशीम पडदा बाजूला सरकण्याचा आवाज',
+        desc: 'जरीकाठी रेशमी पडदा व सुवर्ण पदक. स्पर्श करताच पडदा दोन्ही बाजूंना सरकतो व पुष्पवृष्टी होते.'
     },
     {
         id: 'book-flip',
@@ -329,11 +329,11 @@ const OPENING_STYLES = [
         desc: 'राजेशाही हार्डबाउंड पुस्तक. स्पर्श करून किंवा स्वाईप करून पाहुणे स्वतः हाताने एक-एक पान उलटून विधी पाहू शकतात.'
     },
     {
-        id: 'silk-curtains',
-        name: '६. रेशमी मखमली पडदा (Silk Curtains Reveal)',
-        icon: '🎭',
-        sound: 'मखमली रेशीम पडदा बाजूला सरकण्याचा आवाज',
-        desc: 'नाट्यगृह व शाही महालाप्रमाणे दोन लाल रेशमी पडदे दोन्ही बाजूला सरकतात व भव्य स्वागत दृश्य प्रकट होते.'
+        id: 'shagun-box',
+        name: '६. शाही शगुन पेटी (Shagun Jewel Box)',
+        icon: '🎁',
+        sound: 'पेटी कुलूप उघडण्याचा आवाज',
+        desc: 'पितळी कुलूप असलेली शाही लाल शगुन पेटी. कुलूप उघडताच पेटीतून लग्नपत्रिका प्रकट होते.'
     }
 ];
 
@@ -2273,18 +2273,19 @@ function initOpeningStyles() {
     cards.forEach(card => {
         card.addEventListener('click', () => {
             const styleId = card.getAttribute('data-style-card');
-            if (styleId) selectOpeningStyle(styleId);
+            if (styleId && styleId !== weddingSettings?.openingStyle) selectOpeningStyle(styleId);
         });
     });
     updateOpeningStylesUI((weddingSettings && weddingSettings.openingStyle) || 'envelope-wax');
 }
 
-function selectOpeningStyle(styleId) {
+async function selectOpeningStyle(styleId) {
+    if (!OPENING_STYLES.some(style => style.id === styleId)) return;
     if (!weddingSettings) weddingSettings = {};
     weddingSettings.openingStyle = styleId;
     updateOpeningStylesUI(styleId);
     markDirty();
-    showToast("✓ पत्रिका उघडण्याची शैली '" + styleId + "' निवडली गेली!");
+    await saveSettings();
 }
 
 function updateOpeningStylesUI(activeStyle) {
@@ -2292,12 +2293,24 @@ function updateOpeningStylesUI(activeStyle) {
         const id = card.getAttribute('data-style-card');
         const isActive = id === activeStyle;
         card.classList.toggle('is-active-style', isActive);
+        card.style.borderColor = isActive ? '#D4AF37' : '#E0D4C5';
+        card.style.background = isActive ? '#FFFDF8' : '#FFFDF9';
+        card.style.boxShadow = isActive
+            ? '0 8px 30px rgba(212, 175, 55, 0.35)'
+            : '0 6px 18px rgba(0,0,0,0.06)';
+        const button = card.querySelector('.btn-select-style');
+        if (button) {
+            button.setAttribute('aria-pressed', String(isActive));
+            button.textContent = isActive ? '✓ ही सध्या निवडलेली शैली आहे' : 'ही शैली निवडा';
+        }
     });
     const titleEl = document.getElementById('activeStyleTitle');
     if (titleEl) {
         const found = OPENING_STYLES.find(s => s.id === activeStyle);
         titleEl.textContent = found ? found.name : activeStyle;
     }
+    const previewLink = document.getElementById('btnPreviewOpeningStyle');
+    if (previewLink) previewLink.href = `/c/${encodeURIComponent(activeWebsiteId || 'aaditi-rohan')}`;
 }
 
 /* ========================================================
