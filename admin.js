@@ -1,6 +1,6 @@
 /**
  * विवाह सोहळा ॲडमिन कंट्रोल पॅनेल (Admin Management Dashboard)
- * 20 Cultural Themes, 6 Opening Styles, Multi-Website Hub, Launch Center, Item CRUD & Responsive Preview
+ * 20 Cultural Themes, 9 Opening Styles, Multi-Website Hub, Launch Center, Item CRUD & Responsive Preview
  */
 
 function deepMerge(target, source) {
@@ -334,6 +334,27 @@ const OPENING_STYLES = [
         icon: '🎁',
         sound: 'पेटी कुलूप उघडण्याचा आवाज',
         desc: 'पितळी कुलूप असलेली शाही लाल शगुन पेटी. कुलूप उघडताच पेटीतून लग्नपत्रिका प्रकट होते.'
+    },
+    {
+        id: 'grand-diya',
+        name: '७. मंगल दीप प्रज्वलन (Grand Diya Lighting)',
+        icon: '🪔',
+        sound: 'मंदिर घंटा आणि मंगल नाद',
+        desc: 'पाहुणे मोठ्या पितळी दीपाच्या वातीला स्पर्श करतात. तेजस्वी ज्योत, चमकणाऱ्या ठिणग्या आणि मंगल आशीर्वादांसह आमंत्रण उलगडते.'
+    },
+    {
+        id: 'modern-glass',
+        name: '८. मॉडर्न ग्लास आमंत्रण (Modern Glass Invite)',
+        icon: '✨',
+        sound: 'हळुवार डिजिटल पान उलटण्याचा नाद',
+        desc: 'स्वच्छ आधुनिक काचेसारखे कार्ड, हलका रंगीत प्रकाश आणि स्पर्श करताच उघडणारे डिजिटल आमंत्रण.'
+    },
+    {
+        id: 'lotus-bloom',
+        name: '९. पारंपरिक कमळ पुष्प (Traditional Lotus Bloom)',
+        icon: '🪷',
+        sound: 'मंगल पुष्पध्वनी',
+        desc: 'पाहुणे कमळाच्या मध्यभागी स्पर्श करतात. पाकळ्या उमलताच पारंपरिक विवाह आमंत्रण सुंदरपणे प्रकट होते.'
     }
 ];
 
@@ -2289,9 +2310,10 @@ async function selectOpeningStyle(styleId) {
 }
 
 function updateOpeningStylesUI(activeStyle) {
+    const normalizedStyle = activeStyle === 'modern-scroll' ? 'modern-glass' : activeStyle;
     document.querySelectorAll('.opening-style-card').forEach(card => {
         const id = card.getAttribute('data-style-card');
-        const isActive = id === activeStyle;
+        const isActive = id === normalizedStyle;
         card.classList.toggle('is-active-style', isActive);
         card.style.borderColor = isActive ? '#D4AF37' : '#E0D4C5';
         card.style.background = isActive ? '#FFFDF8' : '#FFFDF9';
@@ -2306,8 +2328,8 @@ function updateOpeningStylesUI(activeStyle) {
     });
     const titleEl = document.getElementById('activeStyleTitle');
     if (titleEl) {
-        const found = OPENING_STYLES.find(s => s.id === activeStyle);
-        titleEl.textContent = found ? found.name : activeStyle;
+        const found = OPENING_STYLES.find(s => s.id === normalizedStyle);
+        titleEl.textContent = found ? found.name : normalizedStyle;
     }
     const previewLink = document.getElementById('btnPreviewOpeningStyle');
     if (previewLink) previewLink.href = `/c/${encodeURIComponent(activeWebsiteId || 'aaditi-rohan')}`;
@@ -2636,6 +2658,7 @@ async function saveSettings() {
     } else {
         showToast(`✓ '${targetSlug}' चे बदल स्थानिकरित्या (LocalStorage) सुरक्षित सेव्ह झाले!`);
     }
+    return serverSaved;
 }
 
 function initMediaUploadControls() {
@@ -2743,6 +2766,8 @@ function initMediaUploadControls() {
             weddingSettings.media.videoUrl = url;
             weddingSettings.media.customVideo = url;
             weddingSettings.media.useGhibliVideo = url === 'assets/video/ghibli_wedding_journey.mp4';
+            const videoUrlInput = document.getElementById('videoUrlInput');
+            if (videoUrlInput) videoUrlInput.value = url;
             weddingSettings.sections = weddingSettings.sections || {};
             weddingSettings.sections.showVideo = Boolean(url);
             setCheck('secShowVideo', Boolean(url));
@@ -2750,10 +2775,12 @@ function initMediaUploadControls() {
             weddingSettings.media.backgroundAudio = url;
             weddingSettings.media.bgMusicUrl = url;
             weddingSettings.media.customAudio = url;
+            const audioUrlInput = document.getElementById('bgMusicUrl');
+            if (audioUrlInput) audioUrlInput.value = url;
         }
         updatePreview(control, url);
         markDirty();
-        await saveSettings();
+        return await saveSettings();
     };
 
     const uploadFile = (control, file) => {
@@ -2772,12 +2799,14 @@ function initMediaUploadControls() {
         const fill = progress?.querySelector('.fill');
         progress?.classList.remove('hidden');
         if (fill) fill.style.width = '0%';
-        const client = encodeURIComponent((activeWebsiteId || 'aaditi-rohan').replace(/[^a-z0-9_-]/gi, '_'));
+        const clientSlug = (activeWebsiteId || 'aaditi-rohan').toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+        const client = encodeURIComponent(clientSlug);
         const request = new XMLHttpRequest();
         request.open('POST', `/api/upload?client=${client}`);
         const adminToken = getAdminToken();
         if (adminToken) request.setRequestHeader('X-Admin-Token', adminToken);
-        request.setRequestHeader('X-Filename', encodeURIComponent(file.name));
+        // Unique names prevent replacements from using the old browser-cached URL.
+        request.setRequestHeader('X-Filename', encodeURIComponent(`${Date.now()}_${file.name}`));
         request.upload.addEventListener('progress', event => {
             if (event.lengthComputable && fill) fill.style.width = `${Math.round(event.loaded / event.total * 100)}%`;
         });
@@ -2788,8 +2817,12 @@ function initMediaUploadControls() {
                 if (request.status < 200 || request.status >= 300 || !result.success || !result.url) {
                     throw new Error(result.error || 'फाइल अपलोड झाली नाही.');
                 }
-                await saveMediaUrl(control, result.url);
-                showToast(control.kind === 'video' ? '✓ व्हिडिओ अपलोड करून सेव्ह केला!' : '✓ ऑडिओ अपलोड करून सेव्ह केला!');
+                const savedOnServer = await saveMediaUrl(control, result.url);
+                if (!savedOnServer) {
+                    showToast('फाइल अपलोड झाली, पण क्लायंट सेटिंग्ज सर्व्हरवर सेव्ह झाल्या नाहीत. पुन्हा लॉगइन करून सेव्ह करा.');
+                    return;
+                }
+                showToast(control.kind === 'video' ? '✓ व्हिडिओ क्लायंटच्या वेबसाईटवर अपलोड व सेव्ह झाला!' : '✓ ऑडिओ क्लायंटच्या वेबसाईटवर अपलोड व सेव्ह झाला!');
             } catch (error) {
                 showToast('अपलोड अयशस्वी: ' + (error.message || error));
             }

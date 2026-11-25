@@ -204,10 +204,11 @@ function escapeHTML(str) {
    ======================================================== */
 async function loadAndApplySettings() {
     let merged = JSON.parse(JSON.stringify(DEFAULT_SETTINGS_DATA));
+    const preloadedSettings = (typeof window !== 'undefined' && window.PRELOADED_WEDDING_SETTINGS)
+        ? window.PRELOADED_WEDDING_SETTINGS
+        : null;
 
-    if (typeof window !== 'undefined' && window.PRELOADED_WEDDING_SETTINGS) {
-        merged = deepMerge(merged, window.PRELOADED_WEDDING_SETTINGS);
-    }
+    if (preloadedSettings) merged = deepMerge(merged, preloadedSettings);
 
     // 1. Detect requested client/website from multiple URL sources
     const urlParams = new URLSearchParams(window.location.search);
@@ -289,6 +290,10 @@ async function loadAndApplySettings() {
             }
         } catch(err){}
     }
+
+    // On static hosts the server API may be unavailable. Reapply the tenant
+    // payload last so shared defaults/local cache cannot replace its opening style.
+    if (preloadedSettings) merged = deepMerge(merged, preloadedSettings);
 
     currentSettings = merged;
     applySettingsToDOM(currentSettings);

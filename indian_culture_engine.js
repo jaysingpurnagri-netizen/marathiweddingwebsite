@@ -1,7 +1,7 @@
 /**
  * indian_culture_engine.js
  * Comprehensive Indian Culture Wedding Engine:
- * - 6 Interactive Invitation Opening Experiences with 3D Physics
+ * - 9 Interactive Invitation Opening Experiences with 3D Physics
  * - Procedural Web Audio Sound Synthesizers (Wax Seal, Temple Bell, Fanfare, Silk Swoosh, Page Flip)
  * - Digital Shagun & UPI QR Code Generator (GPay, PhonePe, Paytm)
  * - Virtual Aarti & Sacred Diya Lighting
@@ -191,17 +191,17 @@
     };
 
     // -------------------------------------------------------------
-    // 2. INVITATION OPENING EXPERIENCES CONTROLLER (6 STYLES)
+    // 2. INVITATION OPENING EXPERIENCES CONTROLLER (9 STYLES)
     // -------------------------------------------------------------
-    const STYLES = ['envelope-wax', 'temple-doors', 'royal-scroll', 'silk-curtains', 'book-flip', 'shagun-box'];
+    const STYLES = ['envelope-wax', 'temple-doors', 'royal-scroll', 'silk-curtains', 'book-flip', 'shagun-box', 'grand-diya', 'modern-glass', 'lotus-bloom'];
     let currentOpenStyle = 'envelope-wax';
 
     function initOpeningStyles() {
         // Read active opening style from settings or localStorage
         const preloaded = window.PRELOADED_WEDDING_SETTINGS || {};
-        const defaultStyle = (window.currentSettings && window.currentSettings.openingStyle)
-            ? window.currentSettings.openingStyle
-            : (preloaded.openingStyle || 'envelope-wax');
+        const defaultStyle = preloaded.openingStyle
+            || (window.currentSettings && window.currentSettings.openingStyle)
+            || 'envelope-wax';
         // The admin-selected style is authoritative; guest browser storage must
         // not override the opening experience configured for this invitation.
         currentOpenStyle = STYLES.includes(defaultStyle) ? defaultStyle : 'envelope-wax';
@@ -304,6 +304,73 @@
         if (boxClasp) boxClasp.addEventListener('click', openShagunBox);
         if (stageBox) stageBox.addEventListener('click', openShagunBox);
 
+        // 7. GRAND DIYA: a large brass lamp with a real animated flame and sparks.
+        const stageDiya = document.getElementById('stageDiya');
+        const btnLightGrandDiya = document.getElementById('btnLightGrandDiya');
+        function lightGrandDiya() {
+            if (!stageDiya || stageDiya.classList.contains('is-lit')) return;
+            stageDiya.classList.add('is-lit');
+            SoundFX.templeBell();
+            SoundFX.flowerTwinkle();
+            const rect = btnLightGrandDiya?.getBoundingClientRect();
+            if (rect) {
+                for (let i = 0; i < 18; i++) {
+                    const spark = document.createElement('span');
+                    spark.className = 'diya-spark';
+                    spark.textContent = i % 3 === 0 ? '✦' : '•';
+                    spark.style.left = `${rect.left + rect.width / 2 + (Math.random() * 100 - 50)}px`;
+                    spark.style.top = `${rect.top + rect.height / 2 + (Math.random() * 35 - 15)}px`;
+                    spark.style.setProperty('--dx', `${Math.random() * 150 - 75}px`);
+                    document.body.appendChild(spark);
+                    setTimeout(() => spark.remove(), 1500);
+                }
+            }
+        }
+        btnLightGrandDiya?.addEventListener('click', event => { event.stopPropagation(); lightGrandDiya(); });
+        stageDiya?.addEventListener('click', lightGrandDiya);
+
+        // 8. MODERN GLASS INVITATION: tap the cover to turn it away.
+        const stageModern = document.getElementById('stageModern');
+        const btnOpenModernInvite = document.getElementById('btnOpenModernInvite');
+        function openModernInvite() {
+            if (stageModern && !stageModern.classList.contains('opened')) {
+                SoundFX.pageFlip();
+                stageModern.classList.add('opened');
+            }
+        }
+        btnOpenModernInvite?.addEventListener('click', event => { event.stopPropagation(); openModernInvite(); });
+        stageModern?.addEventListener('click', openModernInvite);
+
+        // 9. TRADITIONAL LOTUS: bloom the petals around the invitation.
+        const stageLotus = document.getElementById('stageLotus');
+        const btnOpenLotus = document.getElementById('btnOpenLotus');
+        function bloomLotus() {
+            if (stageLotus && !stageLotus.classList.contains('opened')) {
+                SoundFX.flowerTwinkle();
+                stageLotus.classList.add('opened');
+            }
+        }
+        btnOpenLotus?.addEventListener('click', event => { event.stopPropagation(); bloomLotus(); });
+        stageLotus?.addEventListener('click', bloomLotus);
+
+        // Every displayed stage can be opened by tapping its main artwork.
+        // This delegated safety path covers touch targets and non-button areas.
+        const stageOpeners = {
+            'envelope-wax': () => stageEnvelope?.classList.add('opened'),
+            'temple-doors': openTempleDoors,
+            'royal-scroll': unrollRoyalFarman,
+            'silk-curtains': partSilkCurtains,
+            'book-flip': flipOpenBook,
+            'shagun-box': openShagunBox,
+            'grand-diya': lightGrandDiya,
+            'modern-glass': openModernInvite,
+            'lotus-bloom': bloomLotus
+        };
+        document.querySelector('.opening-experience-stage')?.addEventListener('click', event => {
+            if (event.target.closest('.card-enter-btn')) return;
+            stageOpeners[currentOpenStyle]?.();
+        });
+
         // Enter Celebration Buttons (dismiss modal & start music)
         document.querySelectorAll('.card-enter-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -311,7 +378,7 @@
                 dismissEntranceGate();
             });
         });
-        for (let i = 1; i <= 6; i++) {
+        for (let i = 1; i <= 9; i++) {
             const btn = document.getElementById(`btnEnterCelebration${i}`);
             if (btn) {
                 btn.addEventListener('click', (e) => {
@@ -345,6 +412,9 @@
     }
 
     function switchOpenStyleStage(styleId) {
+        const legacyStyleAliases = { 'modern-scroll': 'modern-glass', 'diya': 'grand-diya', 'lotus': 'lotus-bloom' };
+        styleId = legacyStyleAliases[styleId] || styleId;
+        if (!STYLES.includes(styleId)) styleId = 'envelope-wax';
         currentOpenStyle = styleId;
         const stages = {
             'envelope-wax': 'stageEnvelope',
@@ -352,7 +422,10 @@
             'royal-scroll': 'stageScroll',
             'silk-curtains': 'stageCurtains',
             'book-flip': 'stageBook',
-            'shagun-box': 'stageBox'
+            'shagun-box': 'stageBox',
+            'grand-diya': 'stageDiya',
+            'modern-glass': 'stageModern',
+            'lotus-bloom': 'stageLotus'
         };
 
         const instructions = {
@@ -361,7 +434,10 @@
             'royal-scroll': 'शाही फर्मान पत्र वाचण्यासाठी रेशमी गाठ सोडा 📜',
             'silk-curtains': 'विवाह मंडपात प्रवेश करण्यासाठी रेशमी पडद्यावर स्पर्श करा 🎭',
             'book-flip': 'शुभ लग्नपत्रिका उघडण्यासाठी पुस्तकाच्या पानावर स्पर्श करा 📖',
-            'shagun-box': 'शाही शगुन पेटी उघडण्यासाठी सुवर्ण कुलूपावर स्पर्श करा 🎁'
+            'shagun-box': 'शाही शगुन पेटी उघडण्यासाठी सुवर्ण कुलूपावर स्पर्श करा 🎁',
+            'grand-diya': 'मोठा मंगल दीप लावण्यासाठी वातेला स्पर्श करा 🪔',
+            'modern-glass': 'आधुनिक लग्न आमंत्रण उघडण्यासाठी कार्डला स्पर्श करा ✨',
+            'lotus-bloom': 'पारंपरिक कमळ उमलवण्यासाठी मध्यभागी स्पर्श करा 🪷'
         };
 
         const instructionEl = document.getElementById('gateInstructionText');
@@ -387,6 +463,7 @@
                     el.classList.remove('hidden');
                     el.style.display = 'flex';
                     el.classList.remove('opened'); // reset animation so user can click to open
+                    el.classList.remove('is-lit');
                 } else {
                     el.classList.add('hidden');
                     el.style.display = 'none';
@@ -852,12 +929,12 @@
             const coupleName = `चि. सौ. कां. ${g.brideName || 'आदिती'} ❤️ चि. ${g.groomName || 'रोहन'}`;
             const dateStr = `<i class="fa-regular fa-calendar-days"></i> ${g.weddingDateText || 'रविवार, १७ डिसेंबर २०२६'} • ${g.venueName ? g.venueName.split(',')[0] : 'माउली गार्डन'}`;
 
-            ['gateCardCouple', 'gateDoorsCouple', 'gateScrollCouple', 'gateCurtainsCouple', 'gateBookCouple', 'gateBookCoverCouple', 'gateBoxCouple'].forEach(id => {
+            ['gateCardCouple', 'gateDoorsCouple', 'gateScrollCouple', 'gateCurtainsCouple', 'gateBookCouple', 'gateBookCoverCouple', 'gateBoxCouple', 'gateDiyaCouple', 'gateModernCouple', 'gateModernCoverCouple', 'gateLotusCouple'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.textContent = coupleName;
             });
 
-            ['gateCardDate', 'gateDoorsDate', 'gateScrollDate', 'gateCurtainsDate', 'gateBookDate', 'gateBoxDate'].forEach(id => {
+            ['gateCardDate', 'gateDoorsDate', 'gateScrollDate', 'gateCurtainsDate', 'gateBookDate', 'gateBoxDate', 'gateDiyaDate', 'gateModernDate', 'gateLotusDate'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.innerHTML = dateStr;
             });
