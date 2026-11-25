@@ -487,8 +487,9 @@ async function verifyAdminAuth() {
             return !!data.authenticated;
         }
     } catch(e) {}
-    updateAdminAuthUI(true);
-    return true;
+    setAdminToken(null);
+    updateAdminAuthUI(false);
+    return false;
 }
 
 function updateAdminAuthUI(isAuthenticated = null) {
@@ -511,13 +512,18 @@ function updateAdminAuthUI(isAuthenticated = null) {
     if (btnLogout) {
         btnLogout.style.display = isAuth ? 'inline-block' : 'none';
     }
+    ['btnCloseAdminLoginModal', 'btnCancelAdminLogin'].forEach(id => {
+        const button = document.getElementById(id);
+        if (button) button.style.display = isAuth ? '' : 'none';
+    });
 }
 
 function openAdminLoginModal() {
     const modal = document.getElementById('adminLoginModal');
     const alertEl = document.getElementById('adminLoginAlert');
     const pwdInput = document.getElementById('adminPasswordInput');
-    if (alertEl) alertEl.style.display = 'none';
+    if (alertEl) { alertEl.style.display = 'none'; alertEl.textContent = ''; }
+    showAdminAuthMode('login');
     if (pwdInput) {
         pwdInput.value = '';
         setTimeout(() => pwdInput.focus(), 150);
@@ -526,19 +532,36 @@ function openAdminLoginModal() {
 }
 
 function closeAdminLoginModal() {
+    if (!getAdminToken()) return;
     const modal = document.getElementById('adminLoginModal');
     if (modal) modal.classList.add('hidden');
 }
 
+function showAdminAuthMode(mode) {
+    const registering = mode === 'register';
+    const loginPanel = document.getElementById('adminLoginPanel');
+    const registerPanel = document.getElementById('adminRegisterPanel');
+    const loginButton = document.getElementById('btnSubmitAdminLogin');
+    const registerButton = document.getElementById('btnSubmitAdminRegister');
+    const alertEl = document.getElementById('adminLoginAlert');
+    if (loginPanel) loginPanel.style.display = registering ? 'none' : 'block';
+    if (registerPanel) registerPanel.style.display = registering ? 'block' : 'none';
+    if (loginButton) loginButton.style.display = registering ? 'none' : 'inline-flex';
+    if (registerButton) registerButton.style.display = registering ? 'inline-flex' : 'none';
+    if (alertEl) { alertEl.style.display = 'none'; alertEl.textContent = ''; }
+}
+
 async function submitAdminLogin() {
     const pwdInput = document.getElementById('adminPasswordInput');
+    const emailInput = document.getElementById('adminEmailInput');
     const alertEl = document.getElementById('adminLoginAlert');
     const password = (pwdInput?.value || '').trim();
+    const email = (emailInput?.value || '').trim();
 
     if (!password) {
         if (alertEl) {
             alertEl.style.display = 'block';
-            alertEl.textContent = 'कृपया ॲडमिन पासवर्ड प्रविष्ट करा.';
+            alertEl.textContent = 'कृपया पासवर्ड प्रविष्ट करा.';
         }
         return;
     }
@@ -547,31 +570,77 @@ async function submitAdminLogin() {
         const res = await fetch('/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password })
+            body: JSON.stringify({ email, password })
         });
         const data = await res.json();
         if (res.ok && data.token) {
             setAdminToken(data.token);
             closeAdminLoginModal();
-            showToast('✓ ॲडमिन लॉगइन यशस्वी! (Admin Access Granted)');
+            showToast('✓ ॲडमिन लॉगइन यशस्वी!');
+            window.location.reload();
         } else {
             if (alertEl) {
                 alertEl.style.display = 'block';
-                alertEl.textContent = data.error || 'अवैध पासवर्ड (Invalid Password). कृपया पुन्हा प्रयत्न करा.';
+                alertEl.textContent = data.error || 'लॉगइन झाले नाही. कृपया पुन्हा प्रयत्न करा.';
             }
         }
     } catch (e) {
-        if (password === 'vivah2026') {
-            setAdminToken('offline_token_' + Date.now());
-            closeAdminLoginModal();
-            showToast('✓ ॲडमिन ऑथेंटिकेशन यशस्वी (Offline Mode)');
-        } else {
-            if (alertEl) {
-                alertEl.style.display = 'block';
-                alertEl.textContent = 'सर्व्हरशी संपर्क नाही किंवा अवैध पासवर्ड.';
-            }
+        if (alertEl) {
+            alertEl.style.display = 'block';
+            alertEl.textContent = 'सर्व्हरशी संपर्क होत नाही. सर्व्हर सुरू करून पुन्हा प्रयत्न करा.';
         }
     }
+}
+
+async function submitAdminRegistration() {
+    const name = (document.getElementById('adminRegisterName')?.value || '').trim();
+    const email = (document.getElementById('adminRegisterEmail')?.value || '').trim();
+    const password = document.getElementById('adminRegisterPassword')?.value || '';
+    const confirm = document.getElementById('adminRegisterConfirm')?.value || '';
+    const alertEl = document.getElementById('adminLoginAlert');
+    const showError = message => { if (alertEl) { alertEl.textContent = message; alertEl.style.display = 'block'; } };
+    if (!name || !email || !password) return showError('नाव, ईमेल आणि पासवर्ड भरा.');
+    if (password.length < 10) return showError('पासवर्ड किमान १० अक्षरांचा असावा.');
+    if (password !== confirm) return showError('दोन्ही पासवर्ड जुळत नाहीत.');
+    try {
+        const res = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, password }) });
+        const data = await res.json();
+        if (!res.ok) return showError(data.error || 'नोंदणी पाठवता आली नाही.');
+        showAdminAuthMode('login');
+        if (alertEl) {
+            alertEl.textContent = 'नोंदणी पाठवली. विद्यमान ॲडमिनने मंजूर केल्यानंतरच लॉगइन करता येईल.';
+            alertEl.style.display = 'block';
+            alertEl.style.background = '#DCFCE7';
+            alertEl.style.color = '#166534';
+        }
+        ['adminRegisterName','adminRegisterEmail','adminRegisterPassword','adminRegisterConfirm'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    } catch (_) { showError('सर्व्हरशी संपर्क होत नाही.'); }
+}
+
+async function loadAdminUsers() {
+    const container = document.getElementById('adminUsersList');
+    if (!container) return;
+    container.innerHTML = '<p>ॲडमिन नोंदणी लोड होत आहेत…</p>';
+    try {
+        const res = await fetch('/api/admin-users', { headers: getAuthHeaders() });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'यादी लोड झाली नाही.');
+        const users = data.users || [];
+        if (!users.length) { container.innerHTML = '<p>अजून कोणतीही ॲडमिन नोंदणी नाही.</p>'; return; }
+        const esc = value => String(value || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+        container.innerHTML = users.map(user => `<article class="admin-user-card" style="background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:16px;margin-bottom:12px;display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap;"><div><strong>${esc(user.name)}</strong><div>${esc(user.email)}</div><small>स्थिती: ${esc(user.status)}${user.reviewedBy ? ` · मंजूर/पुनरावलोकन: ${esc(user.reviewedBy)}` : ''}</small></div>${user.status === 'pending' ? `<div style="display:flex;gap:8px;"><button class="btn btn-save" data-review-email="${esc(user.email)}" data-review-status="approved">मंजूर करा</button><button class="btn btn-outline" data-review-email="${esc(user.email)}" data-review-status="rejected">नाकारा</button></div>` : ''}</article>`).join('');
+        container.querySelectorAll('[data-review-email]').forEach(button => button.addEventListener('click', () => reviewAdminRegistration(button.dataset.reviewEmail, button.dataset.reviewStatus)));
+    } catch (error) { container.innerHTML = `<p>${String(error.message || 'नोंदणी लोड करता आली नाही.').replace(/[<>]/g, '')}</p>`; }
+}
+
+async function reviewAdminRegistration(email, status) {
+    try {
+        const res = await fetch('/api/admin-users/review', { method: 'POST', headers: getAuthHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify({ email, status }) });
+        const data = await res.json();
+        if (!res.ok) return showToast(data.error || 'ही नोंदणी अपडेट झाली नाही.');
+        showToast(status === 'approved' ? 'ॲडमिन नोंदणी मंजूर झाली.' : 'ॲडमिन नोंदणी नाकारली.');
+        loadAdminUsers();
+    } catch (_) { showToast('सर्व्हरशी संपर्क होत नाही.'); }
 }
 
 async function adminLogout() {
@@ -583,6 +652,7 @@ async function adminLogout() {
     } catch(e) {}
     setAdminToken(null);
     showToast('ॲडमिन लॉगआउट झाले.');
+    openAdminLoginModal();
 }
 
 window.getAdminToken = getAdminToken;
@@ -2901,24 +2971,40 @@ function initMediaUploadControls() {
    ======================================================== */
 document.addEventListener('DOMContentLoaded', async () => {
     // 0. Verify admin auth state
-    await verifyAdminAuth();
+    const hasAdminAccess = await verifyAdminAuth();
+    if (!hasAdminAccess) openAdminLoginModal();
 
     // Setup admin modal & auth listeners
     const btnAdminLogout = document.getElementById('btnAdminLogout');
     const btnCloseAdminModal = document.getElementById('btnCloseAdminLoginModal');
     const btnCancelAdminModal = document.getElementById('btnCancelAdminLogin');
     const btnSubmitAdminModal = document.getElementById('btnSubmitAdminLogin');
+    const btnSubmitAdminRegistration = document.getElementById('btnSubmitAdminRegister');
+    const btnShowRegister = document.getElementById('btnShowAdminRegister');
+    const btnBackToLogin = document.getElementById('btnBackToAdminLogin');
     const inputAdminPass = document.getElementById('adminPasswordInput');
+    const inputAdminEmail = document.getElementById('adminEmailInput');
+    const btnRefreshAdminUsers = document.getElementById('btnRefreshAdminUsers');
 
     if (btnAdminLogout) btnAdminLogout.addEventListener('click', adminLogout);
     if (btnCloseAdminModal) btnCloseAdminModal.addEventListener('click', closeAdminLoginModal);
     if (btnCancelAdminModal) btnCancelAdminModal.addEventListener('click', closeAdminLoginModal);
     if (btnSubmitAdminModal) btnSubmitAdminModal.addEventListener('click', submitAdminLogin);
+    if (btnSubmitAdminRegistration) btnSubmitAdminRegistration.addEventListener('click', submitAdminRegistration);
+    if (btnShowRegister) btnShowRegister.addEventListener('click', () => showAdminAuthMode('register'));
+    if (btnBackToLogin) btnBackToLogin.addEventListener('click', () => showAdminAuthMode('login'));
+    if (btnRefreshAdminUsers) btnRefreshAdminUsers.addEventListener('click', loadAdminUsers);
     if (inputAdminPass) {
         inputAdminPass.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') submitAdminLogin();
         });
     }
+    if (inputAdminEmail) inputAdminEmail.addEventListener('keydown', event => { if (event.key === 'Enter') submitAdminLogin(); });
+    const registerInputs = ['adminRegisterName','adminRegisterEmail','adminRegisterPassword','adminRegisterConfirm'];
+    registerInputs.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) input.addEventListener('keydown', event => { if (event.key === 'Enter') submitAdminRegistration(); });
+    });
 
     // Check URL parameters for explicit site selection (?client=... or ?site=... or ?id=...)
     const urlParams = new URLSearchParams(window.location.search);
@@ -2974,6 +3060,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 3. Initialize UI Tabs
     initTabs();
+    const approvalsTab = document.querySelector('[data-tab="tab-admin-approvals"]');
+    if (approvalsTab) approvalsTab.addEventListener('click', loadAdminUsers);
+    if (hasAdminAccess) loadAdminUsers();
 
     // 4. Render All Dynamic Components
     renderTemplatesGrid();

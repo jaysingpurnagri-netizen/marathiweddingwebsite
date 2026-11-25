@@ -99,6 +99,10 @@
                     <i class="fa-solid fa-layer-group"></i>
                     <span>मल्टिपल वेबसाईट हब (Websites Hub)</span>
                 </button>
+                <button class="nav-tab" data-tab="tab-admin-approvals">
+                    <i class="fa-solid fa-user-check"></i>
+                    <span>ॲडमिन नोंदणी मंजुरी (Admin Access)</span>
+                </button>
                 <button class="nav-tab" data-tab="tab-launch">
                     <i class="fa-solid fa-rocket"></i>
                     <span>वेबसाईट लाँच व शेअर सेंटर (Launch Hub)</span>
@@ -248,6 +252,18 @@
                 <div class="websites-hub-grid" id="websitesHubGrid">
                     <!-- Dynamically populated from /api/clients via admin.js -->
                 </div>
+            </div>
+
+            <!-- TAB: Admin account approvals -->
+            <div class="tab-panel" id="tab-admin-approvals">
+                <div class="panel-header">
+                    <h2><i class="fa-solid fa-user-check"></i> ॲडमिन नोंदणी व मंजुरी (Admin Registrations)</h2>
+                    <p>नवीन ॲडमिन नोंदणी तपासा. मंजुरीनंतरच त्या व्यक्तीला ॲडमिन पॅनेलमध्ये प्रवेश मिळेल.</p>
+                </div>
+                <div style="display:flex; justify-content:flex-end; margin-bottom:14px;">
+                    <button type="button" class="btn btn-preview" id="btnRefreshAdminUsers"><i class="fa-solid fa-rotate"></i> यादी रिफ्रेश करा</button>
+                </div>
+                <div id="adminUsersList" class="admin-users-list" aria-live="polite"></div>
             </div>
 
             <!-- TAB: Launch & Share Hub -->
@@ -2335,30 +2351,43 @@
         </div>
     </div>
 
-    <!-- Admin Login Security Modal -->
+    <!-- Admin Login and Registration Security Modal -->
     <div id="adminLoginModal" class="admin-modal hidden">
         <div class="modal-backdrop" id="adminLoginBackdrop"></div>
         <div class="modal-dialog" style="max-width:440px;">
             <div class="modal-header">
-                <h3><i class="fa-solid fa-shield-halved" style="color:#2563EB;"></i> ॲडमिन सुरक्षा पडताळणी (Admin Auth)</h3>
+                <h3><i class="fa-solid fa-shield-halved" style="color:#2563EB;"></i> ॲडमिन प्रवेश (Admin Access)</h3>
                 <button type="button" class="btn-modal-close" id="btnCloseAdminLoginModal">&times;</button>
             </div>
             <div class="modal-body">
-                <p style="color:#64748B; font-size:0.9rem; margin-bottom:14px; line-height:1.5;">
-                    सर्व क्लायंट व्यवस्थापन, नवीन जोडणी, संपादन व डिलीट करण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.<br>
-                    <small style="color:#2563EB;">(डिफॉल्ट पासवर्ड: <strong>vivah2026</strong>)</small>
-                </p>
-                <div class="form-group">
-                    <label style="font-weight:600; font-size:0.88rem; color:#1E293B;">ॲडमिन पासवर्ड (Admin Password)</label>
-                    <input type="password" id="adminPasswordInput" placeholder="पासवर्ड टाका (उदा. vivah2026)" style="width:100%; padding:10px 14px; font-size:1rem; border:1px solid #CBD5E1; border-radius:8px;">
+                <div id="adminLoginPanel">
+                    <p style="color:#64748B; font-size:0.9rem; margin-bottom:14px; line-height:1.5;">अधिकृत ॲडमिन खात्याने किंवा मालकाच्या ॲडमिन पासवर्डने साइन इन करा.</p>
+                    <div class="form-group">
+                        <label for="adminEmailInput" style="font-weight:600; font-size:0.88rem; color:#1E293B;">ईमेल (मालकासाठी रिकामे ठेवा)</label>
+                        <input type="email" id="adminEmailInput" autocomplete="username" placeholder="name@example.com" style="width:100%; padding:10px 14px; font-size:1rem; border:1px solid #CBD5E1; border-radius:8px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPasswordInput" style="font-weight:600; font-size:0.88rem; color:#1E293B;">पासवर्ड</label>
+                        <input type="password" id="adminPasswordInput" autocomplete="current-password" placeholder="पासवर्ड टाका" style="width:100%; padding:10px 14px; font-size:1rem; border:1px solid #CBD5E1; border-radius:8px;">
+                    </div>
+                    <button type="button" class="btn btn-outline" id="btnShowAdminRegister">नवीन ॲडमिन नोंदणी करा</button>
+                </div>
+                <div id="adminRegisterPanel" style="display:none;">
+                    <p style="color:#64748B; font-size:0.9rem; margin-bottom:14px; line-height:1.5;">नोंदणी मंजूर होईपर्यंत या खात्याने साइन इन करता येणार नाही.</p>
+                    <div class="form-group"><label for="adminRegisterName">पूर्ण नाव</label><input id="adminRegisterName" autocomplete="name" maxlength="80" placeholder="तुमचे नाव"></div>
+                    <div class="form-group"><label for="adminRegisterEmail">ईमेल</label><input id="adminRegisterEmail" type="email" autocomplete="email" maxlength="254" placeholder="name@example.com"></div>
+                    <div class="form-group"><label for="adminRegisterPassword">पासवर्ड (किमान १० अक्षरे)</label><input id="adminRegisterPassword" type="password" autocomplete="new-password" minlength="10" placeholder="नवीन पासवर्ड"></div>
+                    <div class="form-group"><label for="adminRegisterConfirm">पासवर्ड पुन्हा टाका</label><input id="adminRegisterConfirm" type="password" autocomplete="new-password" minlength="10" placeholder="पासवर्डची पुष्टी"></div>
+                    <button type="button" class="btn btn-outline" id="btnBackToAdminLogin">साइन इनकडे परत</button>
                 </div>
                 <div id="adminLoginAlert" style="display:none; margin-top:10px; padding:8px 12px; border-radius:6px; background:#FEE2E2; color:#991B1B; font-size:0.85rem;"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline" id="btnCancelAdminLogin">रद्द करा</button>
+                <button type="button" class="btn btn-outline" id="btnCancelAdminLogin">बंद करा</button>
                 <button type="button" class="btn btn-save" id="btnSubmitAdminLogin">
                     <i class="fa-solid fa-key"></i> लॉगइन करा
                 </button>
+                <button type="button" class="btn btn-save" id="btnSubmitAdminRegister" style="display:none;"><i class="fa-solid fa-user-plus"></i> नोंदणी पाठवा</button>
             </div>
         </div>
     </div>

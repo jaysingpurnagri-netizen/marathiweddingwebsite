@@ -14,6 +14,7 @@ const RSVPS_FILE = path.join(PUBLIC_DIR, 'rsvps.json');
 const WISHES_FILE = path.join(PUBLIC_DIR, 'wishes.json');
 const WEBSITES_DIR = path.join(PUBLIC_DIR, 'websites');
 const WEBSITES_INDEX = path.join(WEBSITES_DIR, 'index.json');
+const ADMIN_USERS_FILE = path.join(WEBSITES_DIR, 'admin-users.json');
 
 // Admin Authentication Configuration
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'vivah2026';
@@ -223,7 +224,7 @@ function saveClientWishes(slug, wishes) {
 // ADMIN AUTHENTICATION HELPERS
 // ==========================================
 
-function isAdminAuthenticated(req) {
+function getAdminSession(req) {
   const authHeader = req.headers['authorization'] || '';
   const customHeader = req.headers['x-admin-token'] || '';
   let token = customHeader;
@@ -235,15 +236,19 @@ function isAdminAuthenticated(req) {
     token = parsed.searchParams.get('admin_token');
   }
 
-  if (!token) return false;
+  if (!token) return null;
 
   const session = activeAdminTokens.get(token);
-  if (!session) return false;
+  if (!session) return null;
   if (Date.now() > session.expiresAt) {
     activeAdminTokens.delete(token);
-    return false;
+    return null;
   }
-  return true;
+  return session;
+}
+
+function isAdminAuthenticated(req) {
+  return !!getAdminSession(req);
 }
 
 function requireAdmin(req, res) {
@@ -252,11 +257,25 @@ function requireAdmin(req, res) {
   return false;
 }
 
-function createAdminSession() {
+function createAdminSession(user = { role: 'owner', name: 'Owner' }) {
   const token = 'adm_' + crypto.randomBytes(24).toString('hex');
   const expiresAt = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
-  activeAdminTokens.set(token, { createdAt: Date.now(), expiresAt });
+  activeAdminTokens.set(token, { createdAt: Date.now(), expiresAt, ...user });
   return { token, expiresAt };
+}
+
+function readAdminUsers() {
+  try { return JSON.parse(fs.readFileSync(ADMIN_USERS_FILE, 'utf8')); }
+  catch (_) { return []; }
+}
+
+function saveAdminUsers(users) {
+  fs.writeFileSync(ADMIN_USERS_FILE, JSON.stringify(users, null, 2), 'utf8');
+}
+
+function publicAdminUser(user) {
+  const { passwordHash, salt, ...safe } = user;
+  return safe;
 }
 
 // ==========================================
@@ -486,17 +505,83 @@ const server = http.createServer((req, res) => {
     readJSON((err, payload) => {
       if (err) return sendJSON(res, 400, { error: 'Invalid JSON payload' });
       const pass = payload.password || payload.pin || '';
-      if (pass === ADMIN_PASSWORD) {
-        const session = createAdminSession();
+      const email = String(payload.email || '').trim().toLowerCase();
+      let user = { role: 'owner', name: 'Owner', email: '' };
+      if (email) {
+        const account = readAdminUsers().find(item => item.email === email);
+        if (!account || account.status !== 'approved') {
+          const waiting = account && account.status === 'pending';
+          return sendJSON(res, 403, { success: false, error: waiting ? 'Your registration is awaiting approval from an existing admin.' : 'This admin account is not approved or the credentials are incorrect.' });
+        }
+        const supplied = crypto.scryptSync(String(pass), account.salt, 64);
+        const expected = Buffer.from(account.passwordHash, 'hex');
+        if (expected.length !== supplied.length || !crypto.timingSafeEqual(expected, supplied)) {
+          return sendJSON(res, 401, { success: false, error: 'Email or password is incorrect.' });
+        }
+        user = { role: 'admin', name: account.name, email: account.email };
+      } else if (pass !== ADMIN_PASSWORD) {
+        return sendJSON(res, 401, { success: false, error: 'Admin password is incorrect.' });
+      }
+      if (pass) {
+        const session = createAdminSession(user);
         sendJSON(res, 200, {
           success: true,
           message: 'Admin authentication successful',
           token: session.token,
-          expiresAt: session.expiresAt
+          expiresAt: session.expiresAt,
+          user: { name: user.name, role: user.role, email: user.email }
         });
       } else {
-        sendJSON(res, 401, { success: false, error: 'अवैध पासवर्ड (Invalid Admin Password)' });
+        sendJSON(res, 401, { success: false, error: 'Admin password is required.' });
       }
+    });
+    return;
+  }
+
+  if (pathname === '/api/auth/register' && req.method === 'POST') {
+    readJSON((err, payload) => {
+      if (err) return sendJSON(res, 400, { error: 'Invalid JSON payload' });
+      const name = String(payload.name || '').trim();
+      const email = String(payload.email || '').trim().toLowerCase();
+      const password = String(payload.password || '');
+      if (name.length < 2 || name.length > 80) return sendJSON(res, 400, { error: 'Enter a name between 2 and 80 characters.' });
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) return sendJSON(res, 400, { error: 'Enter a valid email address.' });
+      if (password.length < 10 || password.length > 200) return sendJSON(res, 400, { error: 'Choose a password with at least 10 characters.' });
+      const users = readAdminUsers();
+      if (users.some(item => item.email === email)) return sendJSON(res, 409, { error: 'An admin registration already exists for this email.' });
+      const salt = crypto.randomBytes(16).toString('hex');
+      const passwordHash = crypto.scryptSync(password, salt, 64).toString('hex');
+      users.push({ id: crypto.randomUUID(), name, email, salt, passwordHash, status: 'pending', createdAt: new Date().toISOString(), reviewedAt: null, reviewedBy: null });
+      saveAdminUsers(users);
+      sendJSON(res, 201, { success: true, pending: true, message: 'Registration received. An existing admin must approve it before sign-in.' });
+    });
+    return;
+  }
+
+  if (pathname === '/api/admin-users' && req.method === 'GET') {
+    if (!requireAdmin(req, res)) return;
+    const users = readAdminUsers().sort((a, b) => (a.status === 'pending' ? 0 : 1) - (b.status === 'pending' ? 0 : 1));
+    sendJSON(res, 200, { users: users.map(publicAdminUser) });
+    return;
+  }
+
+  if (pathname === '/api/admin-users/review' && req.method === 'POST') {
+    if (!requireAdmin(req, res)) return;
+    readJSON((err, payload) => {
+      if (err) return sendJSON(res, 400, { error: 'Invalid JSON payload' });
+      const email = String(payload.email || '').trim().toLowerCase();
+      const status = payload.status;
+      if (!['approved', 'rejected'].includes(status)) return sendJSON(res, 400, { error: 'Choose approve or reject.' });
+      const reviewer = getAdminSession(req);
+      if (reviewer.email && reviewer.email === email) return sendJSON(res, 403, { error: 'You cannot review your own registration.' });
+      const users = readAdminUsers();
+      const account = users.find(item => item.email === email);
+      if (!account) return sendJSON(res, 404, { error: 'Registration not found.' });
+      account.status = status;
+      account.reviewedAt = new Date().toISOString();
+      account.reviewedBy = reviewer.email || reviewer.name || 'Owner';
+      saveAdminUsers(users);
+      sendJSON(res, 200, { success: true, user: publicAdminUser(account) });
     });
     return;
   }
