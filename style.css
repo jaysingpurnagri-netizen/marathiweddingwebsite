@@ -2720,6 +2720,190 @@ body {
     flex-wrap: wrap;
 }
 
+/* Live invitation scroll modal (matches the current index.html structure). */
+.royal-scroll-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 5000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(28, 12, 10, 0.78);
+    backdrop-filter: blur(8px);
+}
+
+.royal-scroll-modal.hidden {
+    display: none !important;
+}
+
+.scroll-wrapper {
+    position: relative;
+    width: min(820px, 100%);
+    max-height: min(92vh, 920px);
+    overflow: auto;
+    padding: 30px 18px;
+    z-index: 1;
+}
+
+.scroll-close-btn {
+    position: sticky;
+    top: 0;
+    float: right;
+    z-index: 3;
+    width: 42px;
+    height: 42px;
+    margin: -18px -6px 0 0;
+    border: 1px solid var(--paithani-gold);
+    border-radius: 50%;
+    background: var(--cream-card);
+    color: var(--royal-maroon);
+    font-size: 1.8rem;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: var(--shadow-subtle);
+}
+
+.parchment-container {
+    padding: 12px;
+    border: 2px solid var(--paithani-gold);
+    border-radius: 22px;
+    background: linear-gradient(145deg, #f8e7b7, #fffaf0 34%, #f6e4b8);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.32);
+}
+
+.royal-roller {
+    position: relative;
+    z-index: 2;
+    height: 18px;
+    border: 2px solid #a4771a;
+    border-radius: 20px;
+    background: linear-gradient(#f8dc89, #a97718 48%, #f6d777 65%, #986414);
+    box-shadow: 0 4px 9px rgba(58, 35, 7, 0.25);
+}
+
+.royal-roller-top { margin-bottom: -7px; }
+.royal-roller-bottom { margin-top: -7px; }
+
+.roller-cylinder {
+    position: absolute;
+    inset: 3px 18px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #8b5e13, #ffe79a 25%, #c49325 52%, #ffe79a 75%, #8b5e13);
+}
+
+.roller-finial {
+    position: absolute;
+    top: -5px;
+    width: 26px;
+    height: 26px;
+    border: 2px solid #9f7218;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff2bb, #d4a52e 65%, #805510);
+}
+
+.roller-finial.left { left: -7px; }
+.roller-finial.right { right: -7px; }
+
+.scroll-parchment-sheet {
+    padding: clamp(22px, 5vw, 46px);
+    border: 1px solid rgba(153, 101, 21, 0.4);
+    background: radial-gradient(ellipse at center, #fffdf7, #f8edcf);
+    color: var(--text-dark);
+    box-shadow: inset 0 0 35px rgba(153, 101, 21, 0.12);
+}
+
+.parchment-inner { text-align: center; }
+
+.scroll-heading { margin-bottom: 24px; }
+.scroll-ganesh-icon { color: var(--kumkum-red); font-size: 2rem; }
+.scroll-title {
+    margin: 8px 0;
+    color: var(--royal-maroon);
+    font-family: var(--font-heading);
+    font-size: clamp(1.35rem, 4vw, 2rem);
+}
+.scroll-shloka { color: var(--text-muted); font-style: italic; }
+.scroll-kuldaivat { margin-top: 8px; color: var(--peacock-green); font-weight: 700; }
+
+.scroll-couple-block {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 18px;
+    margin: 24px 0;
+    padding: 20px 12px;
+    border: 1px dashed var(--paithani-gold-dark);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.64);
+}
+
+.scroll-side { min-width: 0; }
+.side-salut { color: var(--paithani-gold-dark); font-weight: 700; }
+.side-name { margin: 4px 0; color: var(--royal-maroon); font-family: var(--font-heading); font-size: clamp(1.4rem, 4vw, 2.2rem); }
+.scroll-knot {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--paithani-gold);
+    border-radius: 50%;
+    background: var(--royal-maroon);
+    color: white;
+}
+
+.scroll-details {
+    margin: 22px auto;
+    padding: 18px;
+    border-radius: 14px;
+    background: rgba(212, 175, 55, 0.12);
+    text-align: left;
+}
+.scroll-details p + p { margin-top: 8px; }
+.scroll-details strong { color: var(--royal-maroon); }
+.scroll-footer-actions { margin-top: 20px; }
+
+/* The current Baraat Battle markup uses team-btn/battle-buttons. */
+.battle-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.team-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    min-height: 48px;
+    padding: 10px 18px;
+    border: 1.5px solid transparent;
+    border-radius: 999px;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    box-shadow: var(--shadow-subtle);
+}
+
+.team-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-royal); }
+.team-btn:focus-visible { outline: 3px solid var(--paithani-gold); outline-offset: 3px; }
+.groom-team { border-color: #2563EB; background: linear-gradient(135deg, #1D4ED8, #60A5FA); color: #fff; }
+.bride-team { border-color: #DB2777; background: linear-gradient(135deg, #BE185D, #F472B6); color: #fff; }
+
+@media (max-width: 560px) {
+    .royal-scroll-modal { padding: 8px; }
+    .scroll-wrapper { max-height: 96vh; padding: 26px 4px; }
+    .parchment-container { padding: 8px; }
+    .scroll-parchment-sheet { padding: 22px 14px; }
+    .scroll-couple-block { grid-template-columns: 1fr; gap: 10px; }
+    .scroll-knot { margin: 0 auto; }
+    .team-btn { flex: 1 1 100%; }
+}
+
 /* Scroll Keyframe Animations */
 @keyframes pulseAura {
     from { opacity: 0.4; transform: scale(0.9); }

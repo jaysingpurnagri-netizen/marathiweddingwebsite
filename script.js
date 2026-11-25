@@ -399,7 +399,7 @@ function applySettingsToDOM(s) {
     const videoSection = document.getElementById('video');
     const videoNavLink = document.querySelector('#navMenu a[href="#video"]');
     const videoSource = video?.querySelector('source');
-    const videoUrl = m.videoUrl || m.customVideo || (m.useGhibliVideo === false ? '' : m.defaultVideo) || '';
+    const videoUrl = m.videoUrl || m.customVideo || (m.useGhibliVideo === true ? m.defaultVideo : '') || '';
     const videoVisible = s.sections?.showVideo !== false && Boolean(videoUrl);
     if (video && videoSource && videoVisible) {
         const publicVideoUrl = toPublicAssetUrl(videoUrl);
@@ -417,6 +417,8 @@ function applySettingsToDOM(s) {
     }
     if (videoSection) videoSection.style.display = videoVisible ? '' : 'none';
     if (videoNavLink) (videoNavLink.closest('li') || videoNavLink).style.display = videoVisible ? '' : 'none';
+    const watchVideoButton = document.getElementById('heroWatchVideoBtn');
+    if (watchVideoButton) watchVideoButton.hidden = !videoVisible;
     if (m.videoTitle) setText('dynVideoTitle', m.videoTitle);
 
     // Love Story
@@ -485,6 +487,11 @@ function applySectionsVisibility(sections, settings = {}) {
             li.style.display = isVisible ? '' : 'none';
         }
     });
+
+    const scrollButton = document.getElementById('heroOpenScrollBtn');
+    const showScroll = sections.showScroll !== false;
+    if (scrollButton) scrollButton.hidden = !showScroll;
+    if (!showScroll) document.getElementById('scrollSection')?.classList.add('hidden');
 }
 
 function renderStoryTimeline(steps) {
@@ -630,7 +637,9 @@ function initScrollModal() {
     const enterBtn = document.getElementById('btnEnterWebsite');
 
     function openScroll() {
-        if (scrollModal) scrollModal.classList.remove('hidden');
+        if (scrollModal && window.currentSettings?.sections?.showScroll !== false) {
+            scrollModal.classList.remove('hidden');
+        }
     }
     function closeScroll() {
         if (scrollModal) scrollModal.classList.add('hidden');

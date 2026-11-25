@@ -2402,7 +2402,7 @@ function populateForm(s) {
     // Media (Audio & Video)
     const med = s.media || {};
     setVal('bgMusicUrl', med.backgroundAudio || med.bgMusicUrl || 'assets/audio/marathi_wedding_shehnai.mp3');
-    setVal('videoUrlInput', med.videoUrl || 'assets/video/ghibli_wedding_journey.mp4');
+    setVal('videoUrlInput', med.videoUrl || (med.useGhibliVideo === true ? (med.defaultVideo || 'assets/video/ghibli_wedding_journey.mp4') : ''));
     setVal('videoPosterInput', med.videoPoster || 'assets/images/hero_couple.jpg');
     setVal('videoTitleInput', med.videoTitle || '');
     setCheck('useGhibliVideoToggle', med.useGhibliVideo === true);
@@ -2727,6 +2727,8 @@ function initMediaUploadControls() {
                 weddingSettings.media.videoUrl = '';
                 weddingSettings.media.customVideo = '';
                 weddingSettings.media.useGhibliVideo = false;
+                const videoUrlInput = document.getElementById('videoUrlInput');
+                if (videoUrlInput) videoUrlInput.value = '';
                 const fallbackToggle = document.getElementById('useGhibliVideoToggle');
                 if (fallbackToggle) fallbackToggle.checked = false;
             } else {
