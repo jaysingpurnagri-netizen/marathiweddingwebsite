@@ -1,6 +1,6 @@
 /**
  * विवाह सोहळा ॲडमिन कंट्रोल पॅनेल (Admin Management Dashboard)
- * 20 Cultural Themes, 9 Opening Styles, Multi-Website Hub, Launch Center, Item CRUD & Responsive Preview
+ * 21 Cultural Themes, 9 Opening Styles, Multi-Website Hub, Launch Center, Item CRUD & Responsive Preview
  */
 
 function deepMerge(target, source) {
@@ -288,6 +288,19 @@ const INDIAN_CULTURAL_TEMPLATES = [
     "badge": "Henna Lace & Fairy Lights",
     "category": "festive",
     "description": "Intricate Henna mandala patterns, deep olive green velvets, twinkling fairy lights, and an enchanting musical Sufi night."
+  },
+  {
+    "id": "ram-mandir",
+    "name": "राम मंदिर (Ram Mandir Ivory & Gold)",
+    "culture": "Ram Mandir / Devotional Garden",
+    "region": "Ayodhya, Uttar Pradesh",
+    "primaryColor": "#8B6A2B",
+    "accentColor": "#C8A45D",
+    "cardBg": "#FFFEFA",
+    "symbol": "🛕",
+    "badge": "Ayodhya Temple & Lotus Garden",
+    "category": "divine",
+    "description": "Ivory invitation styling with delicate antique-gold detailing, flowering garden borders, lotus blooms and a serene temple-pond atmosphere inspired by the reference video."
   }
 ];
 

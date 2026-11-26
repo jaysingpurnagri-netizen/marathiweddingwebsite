@@ -7,7 +7,7 @@
  * - Virtual Aarti & Sacred Diya Lighting
  * - Baraat Battle (Team Groom vs Team Bride Fun Cheer)
  * - Wardrobe & Dress Code Palette Guide
- * - 20 Indian Cultural Themes Gallery & Live Switcher
+ * - 21 Indian Cultural Themes Gallery & Live Switcher
  */
 
 (function() {
@@ -700,7 +700,7 @@
     }
 
     // -------------------------------------------------------------
-    // 6. 20 INDIAN CULTURAL THEMES MODAL CONTROLLER
+    // 6. 21 INDIAN CULTURAL THEMES MODAL CONTROLLER
     // -------------------------------------------------------------
     let allThemesList = [];
 
@@ -733,7 +733,8 @@
                 { id: 'bollywood-glam', nameCultural: '१७. बॉलिवूड स्टारलाईट संगीत', nameEnglish: 'Bollywood Starlight Glam', primaryColor: '#1A1A2E', secondaryColor: '#D4AF37', badge: 'स्टारलाईट', region: 'Modern' },
                 { id: 'haldi-sunshine', nameCultural: '१८. हळदी सोहळा व झेंडू', nameEnglish: 'Haldi Sunshine', primaryColor: '#D97706', secondaryColor: '#F59E0B', badge: 'हळदी उत्सव', region: 'Festive' },
                 { id: 'modern-minimal', nameCultural: '१९. आधुनिक रोझ गोल्ड', nameEnglish: 'Modern Minimal Indo-Western', primaryColor: '#5A3D31', secondaryColor: '#B76E79', badge: 'इंडो-वेस्टर्न', region: 'Modern' },
-                { id: 'ashtavinayak-divine', nameCultural: '२०. अष्टविनायक शुभाशीर्वाद', nameEnglish: 'Ashtavinayak Blessings', primaryColor: '#991B1B', secondaryColor: '#D97706', badge: 'श्री गणेश कृपा', region: 'Devbhoomi' }
+                { id: 'ashtavinayak-divine', nameCultural: '२०. अष्टविनायक शुभाशीर्वाद', nameEnglish: 'Ashtavinayak Blessings', primaryColor: '#991B1B', secondaryColor: '#D97706', badge: 'श्री गणेश कृपा', region: 'Devbhoomi' },
+                { id: 'ram-mandir', nameCultural: '२१. राम मंदिर मंगल विवाह', nameEnglish: 'Ram Mandir Ivory & Gold', primaryColor: '#8B6A2B', secondaryColor: '#C8A45D', badge: 'अयोध्या मंदिर व कमळ', region: 'Ayodhya' }
             ];
         }
     }

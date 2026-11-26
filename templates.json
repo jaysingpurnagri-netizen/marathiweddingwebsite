@@ -318,5 +318,21 @@
     "symbol": "🕉️",
     "badge": "Modak & Durva Prasanna",
     "description": "Deeply spiritual divine blessing theme with sacred saffron Shendur, bright Modak yellow, Durva grass green accents, and Lord Ganesha's grace."
+  },
+  {
+    "id": "ram-mandir",
+    "name": "राम मंदिर (Ram Mandir Ivory & Gold)",
+    "culture": "Ram Mandir / Devotional Garden",
+    "region": "Ayodhya, Uttar Pradesh",
+    "primaryColor": "#8B6A2B",
+    "accentColor": "#C8A45D",
+    "bgGradient": "linear-gradient(135deg, #FBF7EE 0%, #EFE3C8 52%, #C8A45D 100%)",
+    "cardBg": "#FFFEFA",
+    "textColor": "#473A2B",
+    "fontHeading": "'Playfair Display', 'Rozha One', serif",
+    "deity": "॥ श्री राम जय राम जय जय राम ॥",
+    "symbol": "🛕",
+    "badge": "Ayodhya Temple & Lotus Garden",
+    "description": "A serene ivory wedding invitation inspired by the video: delicate antique-gold borders, flowering garden edges, lotus blooms, and a Ram Mandir-inspired temple and pond atmosphere."
   }
 ]

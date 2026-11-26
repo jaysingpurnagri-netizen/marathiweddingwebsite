@@ -1,5 +1,5 @@
 /* ==========================================================================
-   themes_indian.css - 20 Authentic Indian Cultural Themes & Regional Styles
+   themes_indian.css - 21 Authentic Indian Cultural Themes & Regional Styles
    Covers: Rajputana, South Indian Kalyanam, Punjabi Anand Karaj, Bengali Biye,
    Gujarati Vivah, Kerala Kasavu, Marathi Peshwai, Kashmiri Chinar, Awadhi Nawabi,
    Marwari Bandhej, Telugu Pelli, Odia Jagannath, Goan Coastal, Peacock Regal,
@@ -448,4 +448,99 @@ body[data-theme="royal-rajputana"] .ceremony-card:hover {
     transform: translateY(-6px) scale(1.01) !important;
     box-shadow: 0 20px 45px rgba(212, 175, 55, 0.22) !important;
     border-color: #D4AF37 !important;
+}
+
+/* Ram Mandir Ivory & Gold — garden invitation inspired by the supplied video. */
+body[data-theme="ram-mandir"] {
+    --paithani-gold: #C8A45D;
+    --paithani-gold-light: #F5EBD5;
+    --paithani-gold-dark: #8B6A2B;
+    --royal-maroon: #806238;
+    --kumkum-red: #A66F62;
+    --peacock-green: #657B62;
+    --cream-parchment: #FBF8F1;
+    --cream-warm: #F3EBDD;
+    --cream-card: rgba(255, 254, 250, 0.96);
+    --text-dark: #473A2B;
+    --text-muted: #837663;
+    --font-heading: 'Playfair Display', 'Rozha One', serif;
+}
+
+body[data-theme="ram-mandir"] .top-announcement {
+    color: #FFFDF7;
+    background: linear-gradient(90deg, #806238, #B99A5E 50%, #806238);
+    border-bottom: 1px solid #E4D2A7;
+}
+
+body[data-theme="ram-mandir"] .hero-section {
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at 50% 86%, rgba(201, 164, 93, .18), transparent 34%),
+        radial-gradient(ellipse at 5% 50%, rgba(144, 164, 130, .15), transparent 23%),
+        radial-gradient(ellipse at 95% 48%, rgba(176, 128, 121, .13), transparent 24%),
+        linear-gradient(180deg, #FFFEFA 0%, #F8F2E7 58%, #FFFDF8 100%);
+}
+
+body[data-theme="ram-mandir"] .hero-section::before,
+body[data-theme="ram-mandir"] .hero-section::after {
+    position: absolute;
+    z-index: 0;
+    pointer-events: none;
+    opacity: .48;
+    font-family: serif;
+    line-height: 1;
+}
+
+body[data-theme="ram-mandir"] .hero-section::before {
+    content: '❀  ❧  ❀';
+    left: clamp(8px, 3vw, 48px);
+    top: 14%;
+    color: #B48B69;
+    font-size: clamp(2.4rem, 7vw, 6rem);
+    writing-mode: vertical-rl;
+    text-shadow: 0 0 24px rgba(101, 123, 98, .22);
+}
+
+body[data-theme="ram-mandir"] .hero-section::after {
+    content: '🪷';
+    right: clamp(10px, 5vw, 76px);
+    bottom: 5%;
+    color: #C8A45D;
+    font-size: clamp(2.6rem, 7vw, 5.5rem);
+    filter: saturate(.55);
+}
+
+body[data-theme="ram-mandir"] .hero-section > * {
+    position: relative;
+    z-index: 1;
+}
+
+body[data-theme="ram-mandir"] .section-title,
+body[data-theme="ram-mandir"] .countdown-title {
+    color: #806238;
+    font-family: 'Playfair Display', 'Rozha One', serif;
+}
+
+body[data-theme="ram-mandir"] .couple-card,
+body[data-theme="ram-mandir"] .ceremony-card,
+body[data-theme="ram-mandir"] .timeline-card,
+body[data-theme="ram-mandir"] .saptapadi-card,
+body[data-theme="ram-mandir"] .gallery-item,
+body[data-theme="ram-mandir"] .dresscode-card,
+body[data-theme="ram-mandir"] .rsvp-container {
+    background: rgba(255, 254, 250, .96) !important;
+    border: 1px solid rgba(188, 155, 93, .42) !important;
+    box-shadow: 0 12px 34px rgba(107, 87, 54, .09) !important;
+    border-radius: 18px !important;
+}
+
+body[data-theme="ram-mandir"] .countdown-timer > div,
+body[data-theme="ram-mandir"] .countdown-number {
+    color: #A88A50;
+}
+
+@media (max-width: 600px) {
+    body[data-theme="ram-mandir"] .hero-section::before { opacity: .22; }
+    body[data-theme="ram-mandir"] .hero-section::after { opacity: .28; }
 }
