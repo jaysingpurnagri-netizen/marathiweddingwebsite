@@ -295,6 +295,19 @@ body {
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         padding: 16px 20px;
         flex-direction: column;
+        z-index: 1001;
+    }
+    .main-nav.open .nav-menu {
+        position: static;
+        left: auto;
+        width: 100%;
+        background: transparent;
+        box-shadow: none;
+        border: none;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
     }
     .nav-menu {
         flex-direction: column;
@@ -310,7 +323,63 @@ body {
         padding: 8px 14px;
     }
     .mobile-toggle-btn, .mobile-toggle {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-container {
+        padding: 8px 12px;
+        gap: 8px;
+    }
+    .logo-link, .logo {
+        min-width: 0;
+        flex: 1 1 auto;
+        flex-shrink: 1;
+        gap: 8px;
+    }
+    .logo-symbol, .logo-icon {
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+    .logo-text-group {
+        min-width: 0;
+        overflow: hidden;
+    }
+    .logo-title {
+        font-size: clamp(0.92rem, 3.6vw, 1.15rem);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+    }
+    .logo-sub {
+        font-size: 0.68rem;
+    }
+    .header-actions {
+        gap: 6px;
+        flex-shrink: 0;
+    }
+    .lang-selector-pill {
+        padding: 2px;
+        gap: 1px;
+    }
+    .lang-btn {
+        padding: 3px 7px;
+        font-size: 0.72rem;
+    }
+    .action-btn {
+        padding: 6px 10px;
+        font-size: 0.82rem;
+    }
+    .action-btn .btn-text {
+        display: none;
+    }
+    .mobile-toggle-btn, .mobile-toggle {
+        padding: 6px 9px;
+        font-size: 1.05rem;
     }
 }
 

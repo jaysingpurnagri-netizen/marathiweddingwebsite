@@ -31,8 +31,8 @@
     <canvas id="petalsCanvas"></canvas>
 
     <!-- Background Music Audio Element -->
-    <audio id="weddingAudio" loop preload="auto">
-        <source id="audioSource" src="/assets/audio/marathi_wedding_shehnai.mp3" type="audio/mpeg">
+    <audio id="weddingAudio" loop preload="none">
+        <source id="audioSource" type="audio/mpeg">
     </audio>
 
     <!-- ==========================================================================
@@ -443,6 +443,9 @@
                 <button id="btnAddToCalendar" class="btn btn-secondary">
                     <i class="fa-regular fa-calendar-plus"></i> कॅलेंडरमध्ये जोडा
                 </button>
+                <button id="btnShareWhatsapp" type="button" class="btn btn-whatsapp">
+                    <i class="fa-brands fa-whatsapp"></i> व्हॉट्सॲपवर शेअर करा
+                </button>
                 <button id="addToCalendarBtn" style="display:none;"></button>
             </div>
         </div>
@@ -517,8 +520,8 @@
 
             <div class="video-card-container">
                 <div class="video-player-box">
-                    <video id="weddingVideo" controls poster="/assets/images/hero_couple.jpg" preload="metadata">
-                        <source src="/assets/video/ghibli_wedding_journey.mp4" type="video/mp4">
+                    <video id="weddingVideo" controls poster="/assets/images/hero_couple.jpg" preload="none">
+                        <source type="video/mp4">
                         आपला ब्राउझर हा व्हिडिओ सपोर्ट करत नाही.
                     </video>
                 </div>
@@ -777,6 +780,24 @@
             </div>
         </div>
     </section>
+
+    <!-- Royal Footer -->
+    <footer class="main-footer text-center" id="mainFooter">
+        <div class="container">
+            <p class="footer-shloka" id="dynFooterShloka">॥ मंगलम भगवान विष्णुः मंगलम गरुडध्वजः । मंगलम पुंडरीकाक्षः मंगलाय तनो हरिः ॥</p>
+            <p id="dynFooterVinita" style="margin-bottom: 6px; font-weight: 600; color: #F9E79F;">आपले नम्र: समस्त परिवार</p>
+            <p id="dynFooterSwagotsuk" style="margin-bottom: 18px; font-size: 0.92rem;">स्वागतोत्सुक: समस्त आप्तेष्ट व स्नेहीजन</p>
+            <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-bottom:18px;">
+                <button type="button" id="footerShareWhatsapp" class="btn btn-whatsapp" style="padding:9px 20px; font-size:0.9rem;">
+                    <i class="fa-brands fa-whatsapp"></i> आमंत्रण शेअर करा
+                </button>
+                <a href="#hero" class="btn btn-secondary" style="padding:9px 20px; font-size:0.9rem;">
+                    <i class="fa-solid fa-arrow-up"></i> वर जा
+                </a>
+            </div>
+            <p class="copyright" id="dynFooterCopyright">॥ शुभ विवाह सस्नेह आमंत्रण ॥</p>
+        </div>
+    </footer>
 
     <!-- Royal Parchment Scroll Modal -->
     <div id="scrollSection" class="royal-scroll-modal hidden">

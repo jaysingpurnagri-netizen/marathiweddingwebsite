@@ -647,16 +647,34 @@
     outline-offset: 3px;
 }
 
+.floating-rsvp-cta[hidden],
+.floating-rsvp-cta.is-hidden-near-rsvp {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(16px);
+}
+
 .floating-rsvp-cta[hidden] { display: none !important; }
 
 @media (max-width: 600px) {
     .floating-rsvp-cta {
         right: 12px;
         bottom: 12px;
-        min-height: 48px;
-        padding: 10px 16px;
-        font-size: 0.9rem;
+        min-height: 40px;
+        padding: 8px 14px;
+        font-size: 0.84rem;
+        box-shadow: 0 6px 18px rgba(81, 0, 20, 0.28);
     }
+}
+
+.btn-whatsapp {
+    background: linear-gradient(135deg, #128C7E, #25D366);
+    color: #fff;
+}
+
+.btn-whatsapp:hover {
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.35);
+    transform: translateY(-3px);
 }
 
 /* Styled Baraat Battle voting card; matches the live HTML class names. */
